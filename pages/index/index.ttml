@@ -1,0 +1,41 @@
+<view class="container">
+  <view class="disclaimer">
+    <text>免责声明：本工具基于统计模型和公开流行病学数据，仅供参考，不构成任何医学建议。</text>
+  </view>
+
+  <view class="card">
+    <view class="card-title">个体死亡概率预测系统</view>
+    <view class="card-desc">基于流行病学数据的多维风险评估模型</view>
+    
+    <view class="feature-list">
+      <view class="feature-item">
+        <text class="feature-icon">📊</text>
+        <text class="feature-text">100种死因精准分析</text>
+      </view>
+      <view class="feature-item">
+        <text class="feature-icon">⏱️</text>
+        <text class="feature-text">预计剩余寿命计算</text>
+      </view>
+      <view class="feature-item">
+        <text class="feature-icon">📈</text>
+        <text class="feature-text">死亡概率预测</text>
+      </view>
+      <view class="feature-item">
+        <text class="feature-icon">💡</text>
+        <text class="feature-text">可改变因素分析</text>
+      </view>
+    </view>
+
+    <button class="btn btn-primary" bindtap="startTest">开始测试</button>
+  </view>
+
+  <view class="card">
+    <view class="card-title">数据来源</view>
+    <view class="card-desc">
+      <text>• 全球疾病负担研究（GBD 2019）\n</text>
+      <text>• WHO全球健康观察\n</text>
+      <text>• 中国死因监测数据集\n</text>
+      <text>• 中国国家癌症中心年报</text>
+    </view>
+  </view>
+</view>

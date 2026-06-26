@@ -1,0 +1,32 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/step1/step1",
+    "pages/step2/step2",
+    "pages/step3/step3",
+    "pages/step4/step4",
+    "pages/result/result"
+  ],
+  "window": {
+    "navigationBarTitleText": "死亡概率预测",
+    "navigationBarBackgroundColor": "#2563eb",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f0f4f8"
+  },
+  "tabBar": {
+    "color": "#64748b",
+    "selectedColor": "#2563eb",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/result/result",
+        "text": "结果"
+      }
+    ]
+  }
+}

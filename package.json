@@ -1,0 +1,12 @@
+{
+  "name": "mortality-miniapp",
+  "version": "1.0.0",
+  "description": "个体死亡概率预测系统 - 抖音小程序版",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["死亡预测", "健康", "抖音小程序"],
+  "author": "GSHPChina",
+  "license": "MIT"
+}

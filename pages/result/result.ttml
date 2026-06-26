@@ -1,0 +1,68 @@
+<view class="container">
+  <view class="survival-display">
+    <view class="big-number">{{result.remainingLife}}</view>
+    <view class="survival-label">预计剩余寿命（年）</view>
+  </view>
+
+  <view class="risk-grid">
+    <view class="risk-item">
+      <view class="risk-value {{result.p1 < 0.02 ? 'risk-low' : result.p1 < 0.1 ? 'risk-mid' : 'risk-high'}}">
+        {{formatPercent(result.p1)}}
+      </view>
+      <view class="risk-label">1年死亡概率</view>
+    </view>
+    <view class="risk-item">
+      <view class="risk-value {{result.p5 < 0.02 ? 'risk-low' : result.p5 < 0.1 ? 'risk-mid' : 'risk-high'}}">
+        {{formatPercent(result.p5)}}
+      </view>
+      <view class="risk-label">5年死亡概率</view>
+    </view>
+    <view class="risk-item">
+      <view class="risk-value {{result.p10 < 0.02 ? 'risk-low' : result.p10 < 0.1 ? 'risk-mid' : 'risk-high'}}">
+        {{formatPercent(result.p10)}}
+      </view>
+      <view class="risk-label">10年死亡概率</view>
+    </view>
+    <view class="risk-item">
+      <view class="risk-value {{result.p20 < 0.02 ? 'risk-low' : result.p20 < 0.1 ? 'risk-mid' : 'risk-high'}}">
+        {{formatPercent(result.p20)}}
+      </view>
+      <view class="risk-label">20年死亡概率</view>
+    </view>
+  </view>
+
+  <view class="result-card">
+    <view class="card-title">主要死因风险</view>
+    <view class="bar-chart">
+      <view class="bar-row" tt:for="{{result.causes}}" tt:key="name">
+        <view class="bar-label">{{item.name}}</view>
+        <view class="bar-track">
+          <view class="bar-fill" style="width: {{item.prob / maxProb * 100}}%"></view>
+        </view>
+        <view class="bar-value">{{formatPercent(item.prob)}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="comparison-box">
+    <view class="comparison-text">
+      您的年死亡风险是同龄平均水平的 <text style="font-weight:700;">{{result.riskRatio}}倍</text>
+    </view>
+  </view>
+
+  <view class="result-card" tt:if="{{result.modifiable.length > 0}}">
+    <view class="card-title">可改变的风险因素</view>
+    <view class="mod-item" tt:for="{{result.modifiable}}" tt:key="factor">
+      <view class="mod-text">
+        <text style="font-weight:600;">{{item.factor}}</text>
+      </view>
+      <view class="mod-impact">+{{item.years}}年</view>
+    </view>
+  </view>
+
+  <view class="disclaimer">
+    <text>本工具基于统计模型和公开流行病学数据，仅供参考，不构成任何医学建议。健康问题请咨询专业医生。</text>
+  </view>
+
+  <button class="btn btn-secondary" bindtap="goHome">返回首页</button>
+</view>

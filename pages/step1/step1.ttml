@@ -1,0 +1,84 @@
+<view class="container">
+  <view class="progress-bar">
+    <view class="progress-item active">
+      <view class="progress-dot">1</view>
+      <text class="progress-text">基本信息</text>
+    </view>
+    <view class="progress-item">
+      <view class="progress-dot">2</view>
+      <text class="progress-text">疾病史</text>
+    </view>
+    <view class="progress-item">
+      <view class="progress-dot">3</view>
+      <text class="progress-text">生活方式</text>
+    </view>
+    <view class="progress-item">
+      <view class="progress-dot">4</view>
+      <text class="progress-text">环境因素</text>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">基本信息</view>
+    <view class="card-desc">请输入您的基础人口统计学信息</view>
+
+    <view class="form-row">
+      <view class="form-group">
+        <text class="form-label">年龄（岁）</text>
+        <input class="input" type="number" value="{{age}}" bindinput="onAgeInput" placeholder="请输入年龄"/>
+      </view>
+      <view class="form-group">
+        <text class="form-label">性别</text>
+        <view class="radio-group">
+          <view class="radio-item {{sex === 'male' ? 'active' : ''}}" bindtap="onSexChange" data-value="male">
+            <text>男</text>
+          </view>
+          <view class="radio-item {{sex === 'female' ? 'active' : ''}}" bindtap="onSexChange" data-value="female">
+            <text>女</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">婚姻状况</text>
+      <view class="radio-group">
+        <view class="radio-item {{marriage === 'married' ? 'active' : ''}}" bindtap="onMarriageChange" data-value="married">
+          <text>已婚</text>
+        </view>
+        <view class="radio-item {{marriage === 'single' ? 'active' : ''}}" bindtap="onMarriageChange" data-value="single">
+          <text>未婚</text>
+        </view>
+        <view class="radio-item {{marriage === 'divorced' ? 'active' : ''}}" bindtap="onMarriageChange" data-value="divorced">
+          <text>离异</text>
+        </view>
+        <view class="radio-item {{marriage === 'widowed' ? 'active' : ''}}" bindtap="onMarriageChange" data-value="widowed">
+          <text>丧偶</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">受教育程度</text>
+      <picker range="{{educationOptions}}" range-key="label" value="{{educationIndex}}" bindchange="onEducationChange">
+        <view class="picker">{{educationOptions[educationIndex].label}}</view>
+      </picker>
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">家庭年收入（万元）</text>
+      <picker range="{{incomeOptions}}" range-key="label" value="{{incomeIndex}}" bindchange="onIncomeChange">
+        <view class="picker">{{incomeOptions[incomeIndex].label}}</view>
+      </picker>
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">职业类型</text>
+      <picker range="{{occupationOptions}}" range-key="label" value="{{occupationIndex}}" bindchange="onOccupationChange">
+        <view class="picker">{{occupationOptions[occupationIndex].label}}</view>
+      </picker>
+    </view>
+
+    <button class="btn btn-primary" bindtap="nextStep">下一步 →</button>
+  </view>
+</view>

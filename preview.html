@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>死亡概率预测 - 小程序预览</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background: #ededed;
+  max-width: 375px;
+  margin: 0 auto;
+  min-height: 100vh;
+  position: relative;
+}
+.phone-frame {
+  background: #f0f4f8;
+  min-height: 100vh;
+  padding-bottom: 100px;
+}
+.nav-bar {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white;
+  padding: 44px 16px 12px;
+  font-size: 17px;
+  font-weight: 600;
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.container {
+  padding: 12px;
+}
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.card-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 8px;
+}
+.card-desc {
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 16px;
+}
+.form-group {
+  margin-bottom: 16px;
+}
+.form-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 8px;
+  display: block;
+}
+.form-hint {
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 8px;
+}
+.input {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 15px;
+  color: #1e293b;
+  background: white;
+  outline: none;
+}
+.input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.1);
+}
+.picker {
+  width: 100%;
+  height: 40px;
+  line-height: 40px;
+  padding: 0 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 15px;
+  color: #1e293b;
+  background: white;
+  cursor: pointer;
+}
+.radio-group, .checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.radio-item, .checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.radio-item.active, .checkbox-item.active {
+  border-color: #2563eb;
+  background: rgba(37,99,235,0.08);
+  color: #2563eb;
+}
+.form-row {
+  display: flex;
+  gap: 12px;
+}
+.form-row .form-group {
+  flex: 1;
+}
+.btn {
+  width: 100%;
+  height: 48px;
+  line-height: 48px;
+  text-align: center;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  margin-top: 16px;
+  cursor: pointer;
+}
+.btn-primary {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white;
+  box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+}
+.btn-secondary {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+.btn-row {
+  display: flex;
+  gap: 12px;
+}
+.btn-row .btn {
+  flex: 1;
+}
+.section-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #2563eb;
+  margin: 16px 0 12px;
+}
+.progress-bar {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: white;
+  margin-bottom: 12px;
+}
+.progress-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.progress-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  background: #e2e8f0;
+  color: #64748b;
+}
+.progress-item.active .progress-dot {
+  background: #2563eb;
+  color: white;
+}
+.progress-item.done .progress-dot {
+  background: #10b981;
+  color: white;
+}
+.progress-text {
+  font-size: 11px;
+  color: #64748b;
+}
+.progress-item.active .progress-text {
+  color: #2563eb;
+  font-weight: 600;
+}
+.survival-display {
+  text-align: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+.big-number {
+  font-size: 48px;
+  font-weight: 800;
+  color: #065f46;
+  line-height: 1;
+}
+.survival-label {
+  font-size: 14px;
+  color: #047857;
+  margin-top: 4px;
+}
+.risk-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.risk-item {
+  text-align: center;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+.risk-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #2563eb;
+}
+.risk-label {
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 2px;
+}
+.risk-low { color: #16a34a; }
+.risk-mid { color: #ea580c; }
+.risk-high { color: #dc2626; }
+.bar-chart {
+  margin-top: 12px;
+}
+.bar-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  gap: 8px;
+}
+.bar-label {
+  width: 80px;
+  font-size: 12px;
+  text-align: right;
+  flex-shrink: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bar-track {
+  flex: 1;
+  height: 20px;
+  background: #f1f5f9;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #2563eb, #3b82f6);
+  transition: width 0.6s ease;
+}
+.bar-value {
+  font-size: 12px;
+  font-weight: 600;
+  width: 50px;
+  flex-shrink: 0;
+}
+.mod-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+.mod-text {
+  font-size: 14px;
+  flex: 1;
+}
+.mod-impact {
+  font-size: 16px;
+  font-weight: 700;
+  color: #16a34a;
+  margin-left: 12px;
+}
+.comparison-box {
+  padding: 12px;
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  border-radius: 8px;
+  border: 1px solid #bfdbfe;
+  margin-top: 12px;
+}
+.comparison-text {
+  font-size: 14px;
+  color: #1e40af;
+}
+.disclaimer {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border: 1px solid #f59e0b;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: #92400e;
+  text-align: center;
+}
+.bmi-display {
+  padding: 8px 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 12px;
+}
+.feature-list {
+  margin: 16px 0;
+}
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+}
+.feature-icon {
+  font-size: 20px;
+}
+.feature-text {
+  font-size: 15px;
+  color: #1e293b;
+}
+.tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 375px;
+  height: 50px;
+  background: white;
+  display: flex;
+  border-top: 1px solid #e2e8f0;
+  z-index: 100;
+}
+.tab-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: #64748b;
+  cursor: pointer;
+}
+.tab-item.active {
+  color: #2563eb;
+}
+.tab-icon {
+  font-size: 20px;
+  margin-bottom: 2px;
+}
+select {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 15px;
+  color: #1e293b;
+  background: white;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+}
+</style>
+</head>
+<body>
+<div class="phone-frame">
+  <div class="nav-bar" id="navTitle">死亡概率预测</div>
+  
+  <div id="page-index" class="page active">
+    <div class="container">
+      <div class="disclaimer">
+        <strong>免责声明：</strong>本工具基于统计模型和公开流行病学数据，仅供参考，不构成任何医学建议。
+      </div>
+      <div class="card">
+        <div class="card-title">个体死亡概率预测系统</div>
+        <div class="card-desc">基于流行病学数据的多维风险评估模型</div>
+        <div class="feature-list">
+          <div class="feature-item"><span class="feature-icon">📊</span><span class="feature-text">100种死因精准分析</span></div>
+          <div class="feature-item"><span class="feature-icon">⏱️</span><span class="feature-text">预计剩余寿命计算</span></div>
+          <div class="feature-item"><span class="feature-icon">📈</span><span class="feature-text">死亡概率预测</span></div>
+          <div class="feature-item"><span class="feature-icon">💡</span><span class="feature-text">可改变因素分析</span></div>
+        </div>
+        <button class="btn btn-primary" onclick="showPage('step1')">开始测试</button>
+      </div>
+      <div class="card">
+        <div class="card-title">数据来源</div>
+        <div class="card-desc">
+          • 全球疾病负担研究（GBD 2019）<br>
+          • WHO全球健康观察<br>
+          • 中国死因监测数据集<br>
+          • 中国国家癌症中心年报
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="page-step1" class="page" style="display:none">
+    <div class="container">
+      <div class="progress-bar">
+        <div class="progress-item active"><div class="progress-dot">1</div><span class="progress-text">基本信息</span></div>
+        <div class="progress-item"><div class="progress-dot">2</div><span class="progress-text">疾病史</span></div>
+        <div class="progress-item"><div class="progress-dot">3</div><span class="progress-text">生活方式</span></div>
+        <div class="progress-item"><div class="progress-dot">4</div><span class="progress-text">环境因素</span></div>
+      </div>
+      <div class="card">
+        <div class="card-title">基本信息</div>
+        <div class="card-desc">请输入您的基础人口统计学信息</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">年龄（岁）</label>
+            <input class="input" type="number" id="age" value="30" placeholder="请输入年龄">
+          </div>
+          <div class="form-group">
+            <label class="form-label">性别</label>
+            <div class="radio-group">
+              <div class="radio-item active" onclick="selectRadio(this, 'sex')" data-value="male">男</div>
+              <div class="radio-item" onclick="selectRadio(this, 'sex')" data-value="female">女</div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">婚姻状况</label>
+          <div class="radio-group">
+            <div class="radio-item active" onclick="selectRadio(this, 'marriage')" data-value="married">已婚</div>
+            <div class="radio-item" onclick="selectRadio(this, 'marriage')" data-value="single">未婚</div>
+            <div class="radio-item" onclick="selectRadio(this, 'marriage')" data-value="divorced">离异</div>
+            <div class="radio-item" onclick="selectRadio(this, 'marriage')" data-value="widowed">丧偶</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">受教育程度</label>
+          <select id="education">
+            <option value="none">未受过教育</option>
+            <option value="primary">小学</option>
+            <option value="low">初中</option>
+            <option value="medium" selected>高中/中专</option>
+            <option value="high">大专/本科</option>
+            <option value="postgrad">硕士及以上</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">家庭年收入（万元）</label>
+          <select id="income">
+            <option value="poverty">≤3万</option>
+            <option value="low">3-8万</option>
+            <option value="medium_low">8-15万</option>
+            <option value="medium" selected>15-30万</option>
+            <option value="medium_high">30-50万</option>
+            <option value="high">50-100万</option>
+            <option value="very_high">>100万</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">职业类型</label>
+          <select id="occupation">
+            <option value="office" selected>办公室/白领</option>
+            <option value="teacher">教育/科研</option>
+            <option value="service">服务业</option>
+            <option value="healthcare">医疗卫生</option>
+            <option value="construction">建筑/采矿</option>
+            <option value="it">IT/互联网</option>
+            <option value="retired">退休</option>
+            <option value="student">学生</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="showPage('step2')">下一步 →</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="page-step2" class="page" style="display:none">
+    <div class="container">
+      <div class="progress-bar">
+        <div class="progress-item done"><div class="progress-dot">✓</div><span class="progress-text">基本信息</span></div>
+        <div class="progress-item active"><div class="progress-dot">2</div><span class="progress-text">疾病史</span></div>
+        <div class="progress-item"><div class="progress-dot">3</div><span class="progress-text">生活方式</span></div>
+        <div class="progress-item"><div class="progress-dot">4</div><span class="progress-text">环境因素</span></div>
+      </div>
+      <div class="card">
+        <div class="card-title">疾病史与家族史</div>
+        <div class="card-desc">请如实填写已确诊的疾病</div>
+        <div class="form-group">
+          <label class="form-label">高血压分级</label>
+          <select id="hypertension">
+            <option value="0" selected>无/正常</option>
+            <option value="1">1级（140-159/90-99mmHg）</option>
+            <option value="2">2级（160-179/100-109mmHg）</option>
+            <option value="3">3级（≥180/≥110mmHg）</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">糖尿病类型</label>
+          <div class="radio-group">
+            <div class="radio-item active" onclick="selectRadio(this, 'diabetes')" data-value="none">无</div>
+            <div class="radio-item" onclick="selectRadio(this, 'diabetes')" data-value="type1">1型</div>
+            <div class="radio-item" onclick="selectRadio(this, 'diabetes')" data-value="type2">2型</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">已确诊疾病（可多选）</label>
+          <div class="checkbox-group">
+            <div class="checkbox-item" onclick="toggleCheckbox(this)" data-key="hasCHD">冠心病</div>
+            <div class="checkbox-item" onclick="toggleCheckbox(this)" data-key="hasStroke">脑卒中</div>
+            <div class="checkbox-item" onclick="toggleCheckbox(this)" data-key="hasCOPD">COPD</div>
+            <div class="checkbox-item" onclick="toggleCheckbox(this)" data-key="hasCancer">恶性肿瘤</div>
+            <div class="checkbox-item" onclick="toggleCheckbox(this)" data-key="hasCKD">慢性肾病</div>
+            <div class="checkbox-item" onclick="toggleCheckbox(this)" data-key="hasHeartFailure">心力衰竭</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">家族心血管病史</label>
+          <div class="radio-group">
+            <div class="radio-item active" onclick="selectRadio(this, 'familyCV')" data-value="no">无</div>
+            <div class="radio-item" onclick="selectRadio(this, 'familyCV')" data-value="one_parent">父/母1人</div>
+            <div class="radio-item" onclick="selectRadio(this, 'familyCV')" data-value="both">父母均有</div>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-secondary" onclick="showPage('step1')">← 上一步</button>
+          <button class="btn btn-primary" onclick="showPage('step3')">下一步 →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="page-step3" class="page" style="display:none">
+    <div class="container">
+      <div class="progress-bar">
+        <div class="progress-item done"><div class="progress-dot">✓</div><span class="progress-text">基本信息</span></div>
+        <div class="progress-item done"><div class="progress-dot">✓</div><span class="progress-text">疾病史</span></div>
+        <div class="progress-item active"><div class="progress-dot">3</div><span class="progress-text">生活方式</span></div>
+        <div class="progress-item"><div class="progress-dot">4</div><span class="progress-text">环境因素</span></div>
+      </div>
+      <div class="card">
+        <div class="card-title">生活方式与行为</div>
+        <div class="card-desc">生活习惯对健康有重要影响</div>
+        <div class="section-title">吸烟</div>
+        <div class="form-group">
+          <label class="form-label">吸烟状态</label>
+          <div class="radio-group">
+            <div class="radio-item active" onclick="selectRadio(this, 'smoke')" data-value="never">从不吸烟</div>
+            <div class="radio-item" onclick="selectRadio(this, 'smoke')" data-value="former">已戒烟</div>
+            <div class="radio-item" onclick="selectRadio(this, 'smoke')" data-value="current">目前吸烟</div>
+          </div>
+        </div>
+        <div class="form-group" id="cigarettesGroup" style="display:none">
+          <label class="form-label">每天吸烟量（支）</label>
+          <input class="input" type="number" id="cigarettes" value="0" placeholder="请输入">
+        </div>
+        <div class="section-title">饮酒</div>
+        <div class="form-group">
+          <label class="form-label">饮酒频率</label>
+          <div class="radio-group">
+            <div class="radio-item active" onclick="selectRadio(this, 'alcohol')" data-value="none">从不/极少</div>
+            <div class="radio-item" onclick="selectRadio(this, 'alcohol')" data-value="occasional">偶尔</div>
+            <div class="radio-item" onclick="selectRadio(this, 'alcohol')" data-value="moderate">适量</div>
+            <div class="radio-item" onclick="selectRadio(this, 'alcohol')" data-value="heavy">大量</div>
+          </div>
+        </div>
+        <div class="section-title">运动</div>
+        <div class="form-group">
+          <label class="form-label">每周运动时长（分钟）</label>
+          <div class="form-hint">WHO推荐每周≥150分钟</div>
+          <input class="input" type="number" id="exercise" value="120" placeholder="请输入">
+        </div>
+        <div class="section-title">体重</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">身高（cm）</label>
+            <input class="input" type="number" id="height" value="170" placeholder="身高" oninput="updateBMI()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">体重（kg）</label>
+            <input class="input" type="number" id="weight" value="65" placeholder="体重" oninput="updateBMI()">
+          </div>
+        </div>
+        <div class="bmi-display" id="bmiDisplay">BMI: 22.5 (正常)</div>
+        <div class="section-title">睡眠</div>
+        <div class="form-group">
+          <label class="form-label">每日睡眠时长（小时）</label>
+          <div class="form-hint">7-8小时为最佳</div>
+          <input class="input" type="number" id="sleep" value="7" placeholder="请输入">
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-secondary" onclick="showPage('step2')">← 上一步</button>
+          <button class="btn btn-primary" onclick="showPage('step4')">下一步 →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="page-step4" class="page" style="display:none">
+    <div class="container">
+      <div class="progress-bar">
+        <div class="progress-item done"><div class="progress-dot">✓</div><span class="progress-text">基本信息</span></div>
+        <div class="progress-item done"><div class="progress-dot">✓</div><span class="progress-text">疾病史</span></div>
+        <div class="progress-item done"><div class="progress-dot">✓</div><span class="progress-text">生活方式</span></div>
+        <div class="progress-item active"><div class="progress-dot">4</div><span class="progress-text">环境因素</span></div>
+      </div>
+      <div class="card">
+        <div class="card-title">环境与社会经济因素</div>
+        <div class="card-desc">外部环境也会显著影响健康风险</div>
+        <div class="section-title">空气质量</div>
+        <div class="form-group">
+          <label class="form-label">居住地空气质量</label>
+          <div class="radio-group">
+            <div class="radio-item" onclick="selectRadio(this, 'airQuality')" data-value="good">优良</div>
+            <div class="radio-item active" onclick="selectRadio(this, 'airQuality')" data-value="moderate">中等</div>
+            <div class="radio-item" onclick="selectRadio(this, 'airQuality')" data-value="poor">较差</div>
+            <div class="radio-item" onclick="selectRadio(this, 'airQuality')" data-value="very_poor">极差</div>
+          </div>
+        </div>
+        <div class="section-title">出行方式</div>
+        <div class="form-group">
+          <label class="form-label">主要出行方式</label>
+          <div class="radio-group">
+            <div class="radio-item active" onclick="selectRadio(this, 'commute')" data-value="walk">步行/自行车</div>
+            <div class="radio-item" onclick="selectRadio(this, 'commute')" data-value="public">公共交通</div>
+            <div class="radio-item" onclick="selectRadio(this, 'commute')" data-value="car">私家车</div>
+            <div class="radio-item" onclick="selectRadio(this, 'commute')" data-value="motorcycle">摩托车/电动车</div>
+          </div>
+        </div>
+        <div class="section-title">治安水平</div>
+        <div class="form-group">
+          <label class="form-label">所在地区治安水平</label>
+          <div class="radio-group">
+            <div class="radio-item active" onclick="selectRadio(this, 'safety')" data-value="good">良好</div>
+            <div class="radio-item" onclick="selectRadio(this, 'safety')" data-value="moderate">一般</div>
+            <div class="radio-item" onclick="selectRadio(this, 'safety')" data-value="poor">较差</div>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-secondary" onclick="showPage('step3')">← 上一步</button>
+          <button class="btn btn-primary" onclick="calculate()">计算预测结果 →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="page-result" class="page" style="display:none">
+    <div class="container">
+      <div class="survival-display">
+        <div class="big-number" id="lifeExpectancy">--</div>
+        <div class="survival-label">预计剩余寿命（年）</div>
+      </div>
+      <div class="risk-grid">
+        <div class="risk-item">
+          <div class="risk-value" id="p1year">--</div>
+          <div class="risk-label">1年死亡概率</div>
+        </div>
+        <div class="risk-item">
+          <div class="risk-value" id="p5year">--</div>
+          <div class="risk-label">5年死亡概率</div>
+        </div>
+        <div class="risk-item">
+          <div class="risk-value" id="p10year">--</div>
+          <div class="risk-label">10年死亡概率</div>
+        </div>
+        <div class="risk-item">
+          <div class="risk-value" id="p20year">--</div>
+          <div class="risk-label">20年死亡概率</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">主要死因风险</div>
+        <div class="bar-chart" id="causeChart"></div>
+      </div>
+      <div class="comparison-box" id="comparisonText"></div>
+      <div class="card" id="modifiableCard" style="display:none">
+        <div class="card-title">可改变的风险因素</div>
+        <div id="modifiableList"></div>
+      </div>
+      <div class="disclaimer">
+        本工具基于统计模型和公开流行病学数据，仅供参考，不构成任何医学建议。
+      </div>
+      <button class="btn btn-secondary" onclick="showPage('index')">返回首页</button>
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <div class="tab-item active" onclick="showPage('index')">
+      <span class="tab-icon">🏠</span>
+      <span>首页</span>
+    </div>
+    <div class="tab-item" onclick="showPage('result')">
+      <span class="tab-icon">📊</span>
+      <span>结果</span>
+    </div>
+  </div>
+</div>
+
+<script>
+let formData = {
+  sex: 'male',
+  marriage: 'married',
+  diabetes: 'none',
+  familyCV: 'no',
+  smoke: 'never',
+  alcohol: 'none',
+  airQuality: 'moderate',
+  commute: 'walk',
+  safety: 'good'
+};
+
+let checkboxState = {};
+
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+  document.getElementById('page-' + page).style.display = 'block';
+  
+  const titles = {
+    'index': '死亡概率预测',
+    'step1': '基本信息',
+    'step2': '疾病史',
+    'step3': '生活方式',
+    'step4': '环境因素',
+    'result': '预测结果'
+  };
+  document.getElementById('navTitle').textContent = titles[page] || '死亡概率预测';
+  
+  document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+  if (page === 'index') document.querySelectorAll('.tab-item')[0].classList.add('active');
+  if (page === 'result') document.querySelectorAll('.tab-item')[1].classList.add('active');
+  
+  window.scrollTo(0, 0);
+}
+
+function selectRadio(el, name) {
+  el.parentElement.querySelectorAll('.radio-item').forEach(item => item.classList.remove('active'));
+  el.classList.add('active');
+  formData[name] = el.dataset.value;
+  
+  if (name === 'smoke') {
+    document.getElementById('cigarettesGroup').style.display = el.dataset.value === 'current' ? 'block' : 'none';
+  }
+}
+
+function toggleCheckbox(el) {
+  el.classList.toggle('active');
+  checkboxState[el.dataset.key] = el.classList.contains('active');
+}
+
+function updateBMI() {
+  const h = parseFloat(document.getElementById('height').value) / 100;
+  const w = parseFloat(document.getElementById('weight').value);
+  if (h > 0 && w > 0) {
+    const bmi = (w / (h * h)).toFixed(1);
+    let cat = '正常';
+    if (bmi < 18.5) cat = '偏瘦';
+    else if (bmi < 24) cat = '正常';
+    else if (bmi < 28) cat = '超重';
+    else if (bmi < 32) cat = '肥胖';
+    else cat = '重度肥胖';
+    document.getElementById('bmiDisplay').textContent = `BMI: ${bmi} (${cat})`;
+  }
+}
+
+function calculate() {
+  const age = parseInt(document.getElementById('age').value) || 30;
+  const height = parseFloat(document.getElementById('height').value) / 100;
+  const weight = parseFloat(document.getElementById('weight').value);
+  const bmi = height > 0 ? weight / (height * height) : 22;
+  const exercise = parseInt(document.getElementById('exercise').value) || 0;
+  const sleep = parseFloat(document.getElementById('sleep').value) || 7;
+  const cigarettes = parseInt(document.getElementById('cigarettes').value) || 0;
+  const hypertension = parseInt(document.getElementById('hypertension').value) || 0;
+  
+  let qx = 0.001;
+  if (age < 20) qx = 0.0005;
+  else if (age < 30) qx = 0.001;
+  else if (age < 40) qx = 0.0015;
+  else if (age < 50) qx = 0.003;
+  else if (age < 60) qx = 0.008;
+  else if (age < 70) qx = 0.02;
+  else if (age < 80) qx = 0.05;
+  else qx = 0.1;
+  
+  let rr = 1.0;
+  
+  if (hypertension > 0) rr *= [1, 1.5, 2.0, 3.0][hypertension];
+  if (formData.diabetes === 'type1') rr *= 3.0;
+  if (formData.diabetes === 'type2') rr *= 1.8;
+  if (checkboxState.hasCHD) rr *= 2.5;
+  if (checkboxState.hasStroke) rr *= 2.0;
+  if (checkboxState.hasCOPD) rr *= 2.5;
+  if (checkboxState.hasCancer) rr *= 5.0;
+  if (checkboxState.hasCKD) rr *= 2.5;
+  if (checkboxState.hasHeartFailure) rr *= 3.5;
+  
+  if (formData.smoke === 'current') {
+    if (cigarettes <= 10) rr *= 1.5;
+    else if (cigarettes <= 20) rr *= 2.0;
+    else rr *= 2.8;
+  } else if (formData.smoke === 'former') rr *= 1.3;
+  
+  if (formData.alcohol === 'occasional') rr *= 0.95;
+  else if (formData.alcohol === 'moderate') rr *= 1.1;
+  else if (formData.alcohol === 'heavy') rr *= 1.6;
+  
+  if (exercise < 30) rr *= 1.3;
+  else if (exercise < 75) rr *= 1.15;
+  else if (exercise < 150) rr *= 1.05;
+  
+  if (bmi < 18.5) rr *= 1.3;
+  else if (bmi < 25) rr *= 1.0;
+  else if (bmi < 28) rr *= 1.15;
+  else if (bmi < 32) rr *= 1.4;
+  else rr *= 1.8;
+  
+  if (formData.marriage === 'single') rr *= 1.2;
+  else if (formData.marriage === 'divorced') rr *= 1.3;
+  else if (formData.marriage === 'widowed') rr *= 1.4;
+  
+  if (sleep < 5) rr *= 1.35;
+  else if (sleep < 6) rr *= 1.15;
+  else if (sleep > 9) rr *= 1.2;
+  
+  if (formData.airQuality === 'poor') rr *= 1.2;
+  else if (formData.airQuality === 'very_poor') rr *= 1.35;
+  
+  if (formData.commute === 'motorcycle') rr *= 2.5;
+  else if (formData.commute === 'car') rr *= 1.1;
+  
+  if (formData.safety === 'poor') rr *= 1.15;
+  
+  const totalProb = Math.min(qx * rr, 0.95);
+  
+  let survival = 1.0;
+  let lifeYears = 0;
+  for (let y = 1; y <= 100; y++) {
+    const ageRate = totalProb * Math.pow(1.05, y);
+    survival *= (1 - Math.min(ageRate, 0.95));
+    if (survival < 0.5) { lifeYears = y; break; }
+  }
+  if (lifeYears === 0) lifeYears = 100;
+  
+  const p1 = 1 - Math.pow(1 - totalProb, 1);
+  const p5 = 1 - Math.pow(1 - totalProb, 5);
+  const p10 = 1 - Math.pow(1 - totalProb, 10);
+  const p20 = 1 - Math.pow(1 - totalProb, 20);
+  
+  document.getElementById('lifeExpectancy').textContent = lifeYears;
+  document.getElementById('p1year').textContent = (p1 * 100).toFixed(2) + '%';
+  document.getElementById('p5year').textContent = (p5 * 100).toFixed(2) + '%';
+  document.getElementById('p10year').textContent = (p10 * 100).toFixed(2) + '%';
+  document.getElementById('p20year').textContent = (p20 * 100).toFixed(2) + '%';
+  
+  document.getElementById('p1year').className = 'risk-value ' + (p1 < 0.02 ? 'risk-low' : p1 < 0.1 ? 'risk-mid' : 'risk-high');
+  document.getElementById('p5year').className = 'risk-value ' + (p5 < 0.02 ? 'risk-low' : p5 < 0.1 ? 'risk-mid' : 'risk-high');
+  document.getElementById('p10year').className = 'risk-value ' + (p10 < 0.02 ? 'risk-low' : p10 < 0.1 ? 'risk-mid' : 'risk-high');
+  document.getElementById('p20year').className = 'risk-value ' + (p20 < 0.02 ? 'risk-low' : p20 < 0.1 ? 'risk-mid' : 'risk-high');
+  
+  const causes = [
+    {name: '缺血性心脏病', share: 0.145},
+    {name: '脑卒中', share: 0.115},
+    {name: '肺癌', share: 0.057},
+    {name: 'COPD', share: 0.05},
+    {name: '肝癌', share: 0.032},
+    {name: '胃癌', share: 0.028},
+    {name: '心力衰竭', share: 0.025},
+    {name: '急性心梗', share: 0.03},
+    {name: '结直肠癌', share: 0.018},
+    {name: '阿尔茨海默', share: 0.018}
+  ];
+  
+  const maxShare = causes[0].share;
+  let chartHTML = '';
+  causes.forEach(c => {
+    const pct = (c.share / maxShare * 100).toFixed(0);
+    chartHTML += `<div class="bar-row"><div class="bar-label">${c.name}</div><div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div><div class="bar-value">${(c.share * 100).toFixed(1)}%</div></div>`;
+  });
+  document.getElementById('causeChart').innerHTML = chartHTML;
+  
+  const avgRate = qx;
+  const riskRatio = (totalProb / avgRate).toFixed(1);
+  document.getElementById('comparisonText').innerHTML = `<div class="comparison-text">您的年死亡风险是同龄平均水平的 <strong>${riskRatio}倍</strong></div>`;
+  
+  const modifiable = [];
+  if (formData.smoke === 'current') modifiable.push({factor: '戒烟', years: (lifeYears * 0.1).toFixed(1)});
+  if (exercise < 150) modifiable.push({factor: '增加运动', years: (lifeYears * 0.05).toFixed(1)});
+  if (bmi >= 28) modifiable.push({factor: '控制体重', years: (lifeYears * 0.04).toFixed(1)});
+  if (formData.alcohol === 'heavy') modifiable.push({factor: '减少饮酒', years: (lifeYears * 0.03).toFixed(1)});
+  
+  if (modifiable.length > 0) {
+    document.getElementById('modifiableCard').style.display = 'block';
+    document.getElementById('modifiableList').innerHTML = modifiable.map(m => 
+      `<div class="mod-item"><div class="mod-text"><strong>${m.factor}</strong></div><div class="mod-impact">+${m.years}年</div></div>`
+    ).join('');
+  }
+  
+  showPage('result');
+}
+
+updateBMI();
+</script>
+</body>
+</html>

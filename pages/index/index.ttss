@@ -1,0 +1,19 @@
+.feature-list {
+  margin: 32rpx 0;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 16rpx 0;
+}
+
+.feature-icon {
+  font-size: 40rpx;
+}
+
+.feature-text {
+  font-size: 30rpx;
+  color: #1e293b;
+}

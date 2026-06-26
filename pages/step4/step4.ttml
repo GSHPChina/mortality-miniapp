@@ -1,0 +1,84 @@
+<view class="container">
+  <view class="progress-bar">
+    <view class="progress-item done">
+      <view class="progress-dot">✓</view>
+      <text class="progress-text">基本信息</text>
+    </view>
+    <view class="progress-item done">
+      <view class="progress-dot">✓</view>
+      <text class="progress-text">疾病史</text>
+    </view>
+    <view class="progress-item done">
+      <view class="progress-dot">✓</view>
+      <text class="progress-text">生活方式</text>
+    </view>
+    <view class="progress-item active">
+      <view class="progress-dot">4</view>
+      <text class="progress-text">环境因素</text>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">环境与社会经济因素</view>
+    <view class="card-desc">外部环境也会显著影响健康风险</view>
+
+    <view class="section-title">空气质量</view>
+    <view class="form-group">
+      <text class="form-label">居住地空气质量</text>
+      <view class="radio-group">
+        <view class="radio-item {{airQuality === 'good' ? 'active' : ''}}" bindtap="onAirQualityChange" data-value="good">
+          <text>优良</text>
+        </view>
+        <view class="radio-item {{airQuality === 'moderate' ? 'active' : ''}}" bindtap="onAirQualityChange" data-value="moderate">
+          <text>中等</text>
+        </view>
+        <view class="radio-item {{airQuality === 'poor' ? 'active' : ''}}" bindtap="onAirQualityChange" data-value="poor">
+          <text>较差</text>
+        </view>
+        <view class="radio-item {{airQuality === 'very_poor' ? 'active' : ''}}" bindtap="onAirQualityChange" data-value="very_poor">
+          <text>极差</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="section-title">出行方式</view>
+    <view class="form-group">
+      <text class="form-label">主要出行方式</text>
+      <view class="radio-group">
+        <view class="radio-item {{commute === 'walk' ? 'active' : ''}}" bindtap="onCommuteChange" data-value="walk">
+          <text>步行/自行车</text>
+        </view>
+        <view class="radio-item {{commute === 'public' ? 'active' : ''}}" bindtap="onCommuteChange" data-value="public">
+          <text>公共交通</text>
+        </view>
+        <view class="radio-item {{commute === 'car' ? 'active' : ''}}" bindtap="onCommuteChange" data-value="car">
+          <text>私家车</text>
+        </view>
+        <view class="radio-item {{commute === 'motorcycle' ? 'active' : ''}}" bindtap="onCommuteChange" data-value="motorcycle">
+          <text>摩托车/电动车</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="section-title">治安水平</view>
+    <view class="form-group">
+      <text class="form-label">所在地区治安水平</text>
+      <view class="radio-group">
+        <view class="radio-item {{safety === 'good' ? 'active' : ''}}" bindtap="onSafetyChange" data-value="good">
+          <text>良好</text>
+        </view>
+        <view class="radio-item {{safety === 'moderate' ? 'active' : ''}}" bindtap="onSafetyChange" data-value="moderate">
+          <text>一般</text>
+        </view>
+        <view class="radio-item {{safety === 'poor' ? 'active' : ''}}" bindtap="onSafetyChange" data-value="poor">
+          <text>较差</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="btn-row">
+      <button class="btn btn-secondary" bindtap="prevStep">← 上一步</button>
+      <button class="btn btn-primary" bindtap="calculate">计算预测结果 →</button>
+    </view>
+  </view>
+</view>

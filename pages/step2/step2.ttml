@@ -1,0 +1,109 @@
+<view class="container">
+  <view class="progress-bar">
+    <view class="progress-item done">
+      <view class="progress-dot">✓</view>
+      <text class="progress-text">基本信息</text>
+    </view>
+    <view class="progress-item active">
+      <view class="progress-dot">2</view>
+      <text class="progress-text">疾病史</text>
+    </view>
+    <view class="progress-item">
+      <view class="progress-dot">3</view>
+      <text class="progress-text">生活方式</text>
+    </view>
+    <view class="progress-item">
+      <view class="progress-dot">4</view>
+      <text class="progress-text">环境因素</text>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">疾病史与家族史</view>
+    <view class="card-desc">请如实填写已确诊的疾病</view>
+
+    <view class="form-group">
+      <text class="form-label">高血压分级</text>
+      <picker range="{{hypertensionOptions}}" range-key="label" value="{{hypertensionIndex}}" bindchange="onHypertensionChange">
+        <view class="picker">{{hypertensionOptions[hypertensionIndex].label}}</view>
+      </picker>
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">糖尿病类型</text>
+      <view class="radio-group">
+        <view class="radio-item {{diabetes === 'none' ? 'active' : ''}}" bindtap="onDiabetesChange" data-value="none">
+          <text>无</text>
+        </view>
+        <view class="radio-item {{diabetes === 'type1' ? 'active' : ''}}" bindtap="onDiabetesChange" data-value="type1">
+          <text>1型</text>
+        </view>
+        <view class="radio-item {{diabetes === 'type2' ? 'active' : ''}}" bindtap="onDiabetesChange" data-value="type2">
+          <text>2型</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">已确诊疾病（可多选）</text>
+      <view class="checkbox-group">
+        <view class="checkbox-item {{hasCHD ? 'active' : ''}}" bindtap="toggleDisease" data-key="hasCHD">
+          <text>冠心病</text>
+        </view>
+        <view class="checkbox-item {{hasStroke ? 'active' : ''}}" bindtap="toggleDisease" data-key="hasStroke">
+          <text>脑卒中</text>
+        </view>
+        <view class="checkbox-item {{hasCOPD ? 'active' : ''}}" bindtap="toggleDisease" data-key="hasCOPD">
+          <text>COPD</text>
+        </view>
+        <view class="checkbox-item {{hasCancer ? 'active' : ''}}" bindtap="toggleDisease" data-key="hasCancer">
+          <text>恶性肿瘤</text>
+        </view>
+        <view class="checkbox-item {{hasLiverCirrhosis ? 'active' : ''}}" bindtap="toggleDisease" data-key="hasLiverCirrhosis">
+          <text>肝硬化</text>
+        </view>
+        <view class="checkbox-item {{hasCKD ? 'active' : ''}}" bindtap="toggleDisease" data-key="hasCKD">
+          <text>慢性肾病</text>
+        </view>
+        <view class="checkbox-item {{hasHeartFailure ? 'active' : ''}}" bindtap="toggleDisease" data-key="hasHeartFailure">
+          <text>心力衰竭</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">家族心血管病史</text>
+      <view class="radio-group">
+        <view class="radio-item {{familyCV === 'no' ? 'active' : ''}}" bindtap="onFamilyCVChange" data-value="no">
+          <text>无</text>
+        </view>
+        <view class="radio-item {{familyCV === 'one_parent' ? 'active' : ''}}" bindtap="onFamilyCVChange" data-value="one_parent">
+          <text>父/母1人</text>
+        </view>
+        <view class="radio-item {{familyCV === 'both_parents' ? 'active' : ''}}" bindtap="onFamilyCVChange" data-value="both_parents">
+          <text>父母均有</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">家族肿瘤史</text>
+      <view class="radio-group">
+        <view class="radio-item {{familyCancer === 'no' ? 'active' : ''}}" bindtap="onFamilyCancerChange" data-value="no">
+          <text>无</text>
+        </view>
+        <view class="radio-item {{familyCancer === 'one' ? 'active' : ''}}" bindtap="onFamilyCancerChange" data-value="one">
+          <text>1人</text>
+        </view>
+        <view class="radio-item {{familyCancer === 'multi' ? 'active' : ''}}" bindtap="onFamilyCancerChange" data-value="multi">
+          <text>≥2人</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="btn-row">
+      <button class="btn btn-secondary" bindtap="prevStep">← 上一步</button>
+      <button class="btn btn-primary" bindtap="nextStep">下一步 →</button>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,14 @@
+{
+    "appid": "ttab1cdda13578d56e01",
+    "projectname": "mortality-miniapp",
+    "description": "个体死亡概率预测系统",
+    "setting": {
+        "urlCheck": true,
+        "es6": true,
+        "postcss": true,
+        "minified": true,
+        "newFeature": true
+    },
+    "compileType": "miniprogram",
+    "condition": {}
+}

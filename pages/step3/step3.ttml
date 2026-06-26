@@ -1,0 +1,99 @@
+<view class="container">
+  <view class="progress-bar">
+    <view class="progress-item done">
+      <view class="progress-dot">✓</view>
+      <text class="progress-text">基本信息</text>
+    </view>
+    <view class="progress-item done">
+      <view class="progress-dot">✓</view>
+      <text class="progress-text">疾病史</text>
+    </view>
+    <view class="progress-item active">
+      <view class="progress-dot">3</view>
+      <text class="progress-text">生活方式</text>
+    </view>
+    <view class="progress-item">
+      <view class="progress-dot">4</view>
+      <text class="progress-text">环境因素</text>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">生活方式与行为</view>
+    <view class="card-desc">生活习惯对健康有重要影响</view>
+
+    <view class="section-title">吸烟</view>
+    <view class="form-group">
+      <text class="form-label">吸烟状态</text>
+      <view class="radio-group">
+        <view class="radio-item {{smoke === 'never' ? 'active' : ''}}" bindtap="onSmokeChange" data-value="never">
+          <text>从不吸烟</text>
+        </view>
+        <view class="radio-item {{smoke === 'former' ? 'active' : ''}}" bindtap="onSmokeChange" data-value="former">
+          <text>已戒烟</text>
+        </view>
+        <view class="radio-item {{smoke === 'current' ? 'active' : ''}}" bindtap="onSmokeChange" data-value="current">
+          <text>目前吸烟</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="form-group" tt:if="{{smoke === 'current'}}">
+      <text class="form-label">每天吸烟量（支）</text>
+      <input class="input" type="number" value="{{cigarettes}}" bindinput="onCigarettesInput" placeholder="请输入"/>
+    </view>
+
+    <view class="section-title">饮酒</view>
+    <view class="form-group">
+      <text class="form-label">饮酒频率</text>
+      <view class="radio-group">
+        <view class="radio-item {{alcohol === 'none' ? 'active' : ''}}" bindtap="onAlcoholChange" data-value="none">
+          <text>从不/极少</text>
+        </view>
+        <view class="radio-item {{alcohol === 'occasional' ? 'active' : ''}}" bindtap="onAlcoholChange" data-value="occasional">
+          <text>偶尔</text>
+        </view>
+        <view class="radio-item {{alcohol === 'moderate' ? 'active' : ''}}" bindtap="onAlcoholChange" data-value="moderate">
+          <text>适量</text>
+        </view>
+        <view class="radio-item {{alcohol === 'heavy' ? 'active' : ''}}" bindtap="onAlcoholChange" data-value="heavy">
+          <text>大量</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="section-title">运动</view>
+    <view class="form-group">
+      <text class="form-label">每周运动时长（分钟）</text>
+      <text class="form-hint">WHO推荐每周≥150分钟</text>
+      <input class="input" type="number" value="{{exercise}}" bindinput="onExerciseInput" placeholder="请输入"/>
+    </view>
+
+    <view class="section-title">体重</view>
+    <view class="form-row">
+      <view class="form-group">
+        <text class="form-label">身高（cm）</text>
+        <input class="input" type="number" value="{{height}}" bindinput="onHeightInput" placeholder="身高"/>
+      </view>
+      <view class="form-group">
+        <text class="form-label">体重（kg）</text>
+        <input class="input" type="number" value="{{weight}}" bindinput="onWeightInput" placeholder="体重"/>
+      </view>
+    </view>
+    <view class="bmi-display" tt:if="{{bmi > 0}}">
+      <text>BMI: {{bmi}} ({{bmiCategory}})</text>
+    </view>
+
+    <view class="section-title">睡眠</view>
+    <view class="form-group">
+      <text class="form-label">每日睡眠时长（小时）</text>
+      <text class="form-hint">7-8小时为最佳</text>
+      <input class="input" type="number" value="{{sleep}}" bindinput="onSleepInput" placeholder="请输入"/>
+    </view>
+
+    <view class="btn-row">
+      <button class="btn btn-secondary" bindtap="prevStep">← 上一步</button>
+      <button class="btn btn-primary" bindtap="nextStep">下一步 →</button>
+    </view>
+  </view>
+</view>

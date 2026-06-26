@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>末日生存：死亡倒计时 - 3A游戏原型</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #000; overflow: hidden; font-family: 'Segoe UI', sans-serif; }
+canvas { display: block; }
+#gameUI {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+.ui-element { pointer-events: auto; }
+#hud {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  color: #fff;
+  font-size: 14px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+}
+.hud-item {
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.hud-bar {
+  width: 150px;
+  height: 12px;
+  background: rgba(0,0,0,0.5);
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+.hud-bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.3s;
+}
+.health-fill { background: linear-gradient(90deg, #ef4444, #dc2626); }
+.stamina-fill { background: linear-gradient(90deg, #22c55e, #16a34a); }
+.survival-fill { background: linear-gradient(90deg, #3b82f6, #2563eb); }
+#deathTimer {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  color: #ef4444;
+  font-size: 48px;
+  font-weight: 800;
+  text-shadow: 0 0 20px rgba(239,68,68,0.8);
+  font-family: 'Courier New', monospace;
+}
+#deathTimer.warning { animation: pulse 1s infinite; }
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+#minimap {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 180px;
+  height: 180px;
+  background: rgba(0,0,0,0.7);
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 8px;
+}
+#inventory {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 4px;
+}
+.inv-slot {
+  width: 50px;
+  height: 50px;
+  background: rgba(0,0,0,0.7);
+  border: 2px solid rgba(255,255,255,0.2);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.inv-slot:hover { border-color: #3b82f6; background: rgba(59,130,246,0.2); }
+.inv-slot.active { border-color: #22c55e; background: rgba(34,197,94,0.3); }
+.inv-slot .count {
+  position: absolute;
+  bottom: 2px;
+  right: 4px;
+  font-size: 10px;
+  color: #fff;
+}
+#crosshair {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255,255,255,0.5);
+  border-radius: 50%;
+  pointer-events: none;
+}
+#crosshair::before, #crosshair::after {
+  content: '';
+  position: absolute;
+  background: rgba(255,255,255,0.5);
+}
+#crosshair::before {
+  width: 2px;
+  height: 8px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+#crosshair::after {
+  width: 8px;
+  height: 2px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+#startScreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+#startScreen h1 {
+  font-size: 64px;
+  color: #ef4444;
+  text-shadow: 0 0 40px rgba(239,68,68,0.5);
+  margin-bottom: 20px;
+  font-family: 'Impact', sans-serif;
+  letter-spacing: 4px;
+}
+#startScreen h2 {
+  font-size: 24px;
+  color: #94a3b8;
+  margin-bottom: 40px;
+  font-weight: 300;
+}
+#startBtn {
+  padding: 16px 48px;
+  font-size: 20px;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  letter-spacing: 2px;
+  transition: all 0.3s;
+  box-shadow: 0 4px 20px rgba(239,68,68,0.4);
+}
+#startBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(239,68,68,0.6);
+}
+.controls-info {
+  margin-top: 40px;
+  color: #64748b;
+  font-size: 14px;
+  text-align: center;
+  line-height: 2;
+}
+.controls-info span {
+  background: rgba(255,255,255,0.1);
+  padding: 4px 12px;
+  border-radius: 4px;
+  margin: 0 4px;
+}
+#gameOver {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.9);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+#gameOver h1 {
+  font-size: 72px;
+  color: #ef4444;
+  margin-bottom: 20px;
+}
+#gameOver .stats {
+  color: #94a3b8;
+  font-size: 18px;
+  margin-bottom: 30px;
+  text-align: center;
+  line-height: 2;
+}
+#restartBtn {
+  padding: 16px 48px;
+  font-size: 20px;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+#message {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-size: 24px;
+  text-shadow: 0 0 10px rgba(0,0,0,0.8);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+#riskFactors {
+  position: fixed;
+  top: 120px;
+  left: 20px;
+  color: #f59e0b;
+  font-size: 12px;
+  max-width: 200px;
+}
+.risk-factor {
+  margin-bottom: 4px;
+  padding: 4px 8px;
+  background: rgba(245,158,11,0.1);
+  border-left: 3px solid #f59e0b;
+}
+</style>
+</head>
+<body>
+<canvas id="gameCanvas"></canvas>
+
+<div id="gameUI">
+  <div id="hud">
+    <div class="hud-item">
+      <span>❤️ 生命</span>
+      <div class="hud-bar"><div class="hud-bar-fill health-fill" id="healthBar" style="width:100%"></div></div>
+      <span id="healthText">100</span>
+    </div>
+    <div class="hud-item">
+      <span>⚡ 体力</span>
+      <div class="hud-bar"><div class="hud-bar-fill stamina-fill" id="staminaBar" style="width:100%"></div></div>
+      <span id="staminaText">100</span>
+    </div>
+    <div class="hud-item">
+      <span>🛡️ 生存</span>
+      <div class="hud-bar"><div class="hud-bar-fill survival-fill" id="survivalBar" style="width:100%"></div></div>
+      <span id="survivalText">100</span>
+    </div>
+  </div>
+  
+  <div id="deathTimer">59:59</div>
+  
+  <div id="riskFactors"></div>
+  
+  <canvas id="minimap"></canvas>
+  
+  <div id="inventory">
+    <div class="inv-slot active" data-slot="0">🔫</div>
+    <div class="inv-slot" data-slot="1">💊</div>
+    <div class="inv-slot" data-slot="2">🍖</div>
+    <div class="inv-slot" data-slot="3">🔋</div>
+    <div class="inv-slot" data-slot="4">📦</div>
+    <div class="inv-slot" data-slot="5">🔧</div>
+    <div class="inv-slot" data-slot="6">🎯</div>
+    <div class="inv-slot" data-slot="7">💀</div>
+  </div>
+  
+  <div id="crosshair"></div>
+  <div id="message"></div>
+</div>
+
+<div id="startScreen">
+  <h1>末日生存</h1>
+  <h2>DEATH COUNTDOWN</h2>
+  <button id="startBtn" onclick="startGame()">开始生存</button>
+  <div class="controls-info">
+    <span>WASD</span> 移动 | <span>鼠标</span> 视角 | <span>左键</span> 攻击<br>
+    <span>E</span> 拾取 | <span>R</span> 换弹 | <span>Space</span> 跳跃<br>
+    <span>1-8</span> 切换装备 | <span>Shift</span> 冲刺
+  </div>
+</div>
+
+<div id="gameOver">
+  <h1>你已死亡</h1>
+  <div class="stats" id="deathStats"></div>
+  <button id="restartBtn" onclick="restartGame()">重新开始</button>
+</div>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const minimapCanvas = document.getElementById('minimap');
+const minimapCtx = minimapCanvas.getContext('2d');
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+minimapCanvas.width = 180;
+minimapCanvas.height = 180;
+
+let gameRunning = false;
+let gameTime = 3600;
+let score = 0;
+let kills = 0;
+
+const player = {
+  x: 0,
+  y: 0,
+  z: 0,
+  vx: 0,
+  vy: 0,
+  vz: 0,
+  yaw: 0,
+  pitch: 0,
+  health: 100,
+  stamina: 100,
+  survival: 100,
+  speed: 0.15,
+  sprintSpeed: 0.25,
+  isSprinting: false,
+  isJumping: false,
+  jumpForce: 0.15,
+  gravity: 0.008,
+  selectedSlot: 0,
+  inventory: [
+    {name: '手枪', icon: '🔫', ammo: 12, maxAmmo: 12},
+    {name: '医疗包', icon: '💊', count: 3},
+    {name: '食物', icon: '🍖', count: 5},
+    {name: '电池', icon: '🔋', count: 2},
+    {name: '补给箱', icon: '📦', count: 1},
+    {name: '工具', icon: '🔧', count: 1},
+    {name: '陷阱', icon: '🎯', count: 3},
+    {name: '解毒剂', icon: '💀', count: 1}
+  ]
+};
+
+const keys = {};
+let mouseDown = false;
+let lastShot = 0;
+
+const WORLD_SIZE = 500;
+const CELL_SIZE = 50;
+
+const riskFactors = [
+  {name: '辐射暴露', icon: '☢️', effect: '体力-20%'},
+  {name: '病毒感染', icon: '🦠', effect: '生命-15%'},
+  {name: '营养不良', icon: '🍽️', effect: '生存-10%'},
+  {name: '心理压力', icon: '😰', effect: '全属性-5%'},
+  {name: '环境污染', icon: '🏭', effect: '生命-10%'}
+];
+
+let enemies = [];
+let items = [];
+let particles = [];
+let buildings = [];
+let trees = [];
+
+function initWorld() {
+  buildings = [];
+  trees = [];
+  enemies = [];
+  items = [];
+  
+  for (let i = 0; i < 30; i++) {
+    buildings.push({
+      x: (Math.random() - 0.5) * WORLD_SIZE,
+      z: (Math.random() - 0.5) * WORLD_SIZE,
+      w: 20 + Math.random() * 40,
+      h: 30 + Math.random() * 50,
+      d: 20 + Math.random() * 40,
+      color: `hsl(${200 + Math.random() * 20}, ${20 + Math.random() * 10}%, ${30 + Math.random() * 20}%)`
+    });
+  }
+  
+  for (let i = 0; i < 100; i++) {
+    trees.push({
+      x: (Math.random() - 0.5) * WORLD_SIZE,
+      z: (Math.random() - 0.5) * WORLD_SIZE,
+      h: 15 + Math.random() * 20,
+      r: 3 + Math.random() * 4
+    });
+  }
+  
+  for (let i = 0; i < 20; i++) {
+    spawnEnemy();
+  }
+  
+  for (let i = 0; i < 30; i++) {
+    spawnItem();
+  }
+}
+
+function spawnEnemy() {
+  const angle = Math.random() * Math.PI * 2;
+  const dist = 50 + Math.random() * 100;
+  enemies.push({
+    x: player.x + Math.cos(angle) * dist,
+    y: 0,
+    z: player.z + Math.sin(angle) * dist,
+    health: 30 + Math.random() * 70,
+    maxHealth: 100,
+    speed: 0.03 + Math.random() * 0.05,
+    damage: 5 + Math.random() * 15,
+    type: Math.random() > 0.7 ? 'elite' : 'normal',
+    lastAttack: 0,
+    size: 8
+  });
+}
+
+function spawnItem() {
+  const types = ['health', 'ammo', 'food', 'energy'];
+  const type = types[Math.floor(Math.random() * types.length)];
+  items.push({
+    x: (Math.random() - 0.5) * WORLD_SIZE * 0.8,
+    y: 0,
+    z: (Math.random() - 0.5) * WORLD_SIZE * 0.8,
+    type: type,
+    collected: false
+  });
+}
+
+function update(deltaTime) {
+  if (!gameRunning) return;
+  
+  gameTime -= deltaTime / 1000;
+  if (gameTime <= 0) {
+    gameOver('时间耗尽，末日降临...');
+    return;
+  }
+  
+  const moveSpeed = player.isSprinting ? player.sprintSpeed : player.speed;
+  
+  let dx = 0, dz = 0;
+  if (keys['w'] || keys['W']) { dx += Math.sin(player.yaw); dz += Math.cos(player.yaw); }
+  if (keys['s'] || keys['S']) { dx -= Math.sin(player.yaw); dz -= Math.cos(player.yaw); }
+  if (keys['a'] || keys['A']) { dx -= Math.cos(player.yaw); dz += Math.sin(player.yaw); }
+  if (keys['d'] || keys['D']) { dx += Math.cos(player.yaw); dz -= Math.sin(player.yaw); }
+  
+  const len = Math.sqrt(dx * dx + dz * dz);
+  if (len > 0) {
+    dx = dx / len * moveSpeed;
+    dz = dz / len * moveSpeed;
+  }
+  
+  player.x += dx;
+  player.z += dz;
+  player.x = Math.max(-WORLD_SIZE/2, Math.min(WORLD_SIZE/2, player.x));
+  player.z = Math.max(-WORLD_SIZE/2, Math.min(WORLD_SIZE/2, player.z));
+  
+  if (player.isJumping) {
+    player.vy -= player.gravity;
+    player.y += player.vy;
+    if (player.y <= 0) {
+      player.y = 0;
+      player.vy = 0;
+      player.isJumping = false;
+    }
+  }
+  
+  if (player.isSprinting && (dx !== 0 || dz !== 0)) {
+    player.stamina = Math.max(0, player.stamina - 0.2);
+  } else {
+    player.stamina = Math.min(100, player.stamina + 0.1);
+  }
+  
+  if (keys['Shift'] || keys['shift']) {
+    player.isSprinting = player.stamina > 10;
+  } else {
+    player.isSprinting = false;
+  }
+  
+  if (keys[' '] && !player.isJumping) {
+    player.isJumping = true;
+    player.vy = player.jumpForce;
+  }
+  
+  enemies.forEach(enemy => {
+    const dx = player.x - enemy.x;
+    const dz = player.z - enemy.z;
+    const dist = Math.sqrt(dx * dx + dz * dz);
+    
+    if (dist > 2) {
+      enemy.x += (dx / dist) * enemy.speed;
+      enemy.z += (dz / dist) * enemy.speed;
+    } else {
+      const now = Date.now();
+      if (now - enemy.lastAttack > 1000) {
+        player.health -= enemy.damage;
+        enemy.lastAttack = now;
+        showMessage(`受到攻击！-${enemy.damage.toFixed(0)}生命`);
+        createParticles(player.x, player.y + 10, player.z, '#ef4444', 5);
+      }
+    }
+    
+    if (dist > 200) {
+      const angle = Math.random() * Math.PI * 2;
+      enemy.x = player.x + Math.cos(angle) * 100;
+      enemy.z = player.z + Math.sin(angle) * 100;
+    }
+  });
+  
+  if (mouseDown && Date.now() - lastShot > 300) {
+    shoot();
+    lastShot = Date.now();
+  }
+  
+  items.forEach(item => {
+    if (item.collected) return;
+    const dx = player.x - item.x;
+    const dz = player.z - item.z;
+    const dist = Math.sqrt(dx * dx + dz * dz);
+    
+    if (dist < 3 && keys['e']) {
+      item.collected = true;
+      collectItem(item);
+    }
+  });
+  
+  player.health = Math.max(0, Math.min(100, player.health - 0.01));
+  player.survival = Math.max(0, Math.min(100, player.survival - 0.02));
+  
+  if (player.health <= 0 || player.survival <= 0) {
+    gameOver(player.health <= 0 ? '生命值耗尽' : '生存指数归零');
+  }
+  
+  score += deltaTime / 1000;
+  
+  particles = particles.filter(p => p.life > 0);
+  particles.forEach(p => {
+    p.x += p.vx;
+    p.y += p.vy;
+    p.z += p.vz;
+    p.vy -= 0.01;
+    p.life -= 0.02;
+  });
+  
+  if (enemies.length < 15) spawnEnemy();
+  if (items.filter(i => !i.collected).length < 10) spawnItem();
+}
+
+function shoot() {
+  const item = player.inventory[player.selectedSlot];
+  if (item.name === '手枪' && item.ammo > 0) {
+    item.ammo--;
+    
+    for (let i = 0; i < enemies.length; i++) {
+      const enemy = enemies[i];
+      const dx = enemy.x - player.x;
+      const dy = (enemy.y + 10) - (player.y + 10);
+      const dz = enemy.z - player.z;
+      const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+      
+      const nx = dx / dist;
+      const nz = dz / dist;
+      
+      const viewX = Math.sin(player.yaw);
+      const viewZ = Math.cos(player.yaw);
+      
+      const dot = nx * viewX + nz * viewZ;
+      
+      if (dot > 0.95 && dist < 80) {
+        enemy.health -= 25;
+        createParticles(enemy.x, enemy.y + 10, enemy.z, '#ef4444', 8);
+        
+        if (enemy.health <= 0) {
+          enemies.splice(i, 1);
+          kills++;
+          score += 100;
+          showMessage('+100 击杀奖励');
+          spawnItem();
+        }
+        break;
+      }
+    }
+  }
+}
+
+function collectItem(item) {
+  switch(item.type) {
+    case 'health':
+      player.health = Math.min(100, player.health + 25);
+      showMessage('+25 生命值');
+      break;
+    case 'ammo':
+      player.inventory[0].ammo = Math.min(player.inventory[0].maxAmmo, player.inventory[0].ammo + 6);
+      showMessage('+6 弹药');
+      break;
+    case 'food':
+      player.survival = Math.min(100, player.survival + 20);
+      showMessage('+20 生存指数');
+      break;
+    case 'energy':
+      player.stamina = Math.min(100, player.stamina + 30);
+      showMessage('+30 体力');
+      break;
+  }
+  score += 50;
+}
+
+function createParticles(x, y, z, color, count) {
+  for (let i = 0; i < count; i++) {
+    particles.push({
+      x, y, z,
+      vx: (Math.random() - 0.5) * 0.5,
+      vy: Math.random() * 0.3,
+      vz: (Math.random() - 0.5) * 0.5,
+      color: color,
+      life: 1
+    });
+  }
+}
+
+function showMessage(text) {
+  const msg = document.getElementById('message');
+  msg.textContent = text;
+  msg.style.opacity = 1;
+  setTimeout(() => msg.style.opacity = 0, 1500);
+}
+
+function render() {
+  ctx.fillStyle = '#1a1a2e';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  gradient.addColorStop(0, '#0f0f23');
+  gradient.addColorStop(0.5, '#1a1a2e');
+  gradient.addColorStop(1, '#16213e');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  ctx.fillStyle = '#ffffff';
+  for (let i = 0; i < 100; i++) {
+    const sx = (Math.sin(i * 132.1) * 0.5 + 0.5) * canvas.width;
+    const sy = (Math.cos(i * 73.7) * 0.5 + 0.5) * canvas.height * 0.5;
+    const size = Math.sin(Date.now() / 1000 + i) * 0.5 + 1;
+    ctx.globalAlpha = 0.5 + Math.sin(Date.now() / 2000 + i) * 0.3;
+    ctx.fillRect(sx, sy, size, size);
+  }
+  ctx.globalAlpha = 1;
+  
+  ctx.fillStyle = '#0d1117';
+  ctx.fillRect(0, canvas.height * 0.6, canvas.width, canvas.height * 0.4);
+  
+  const objects3D = [];
+  
+  buildings.forEach(b => {
+    const relX = b.x - player.x;
+    const relZ = b.z - player.z;
+    const rotX = relX * Math.cos(player.yaw) - relZ * Math.sin(player.yaw);
+    const rotZ = relX * Math.sin(player.yaw) + relZ * Math.cos(player.yaw);
+    
+    if (rotZ > 0.1) {
+      const scale = 200 / rotZ;
+      const screenX = canvas.width / 2 + rotX * scale;
+      const screenY = canvas.height * 0.6 - b.h * scale / 2;
+      
+      objects3D.push({
+        type: 'building',
+        x: screenX,
+        y: screenY,
+        w: b.w * scale,
+        h: b.h * scale,
+        d: rotZ,
+        color: b.color
+      });
+    }
+  });
+  
+  trees.forEach(t => {
+    const relX = t.x - player.x;
+    const relZ = t.z - player.z;
+    const rotX = relX * Math.cos(player.yaw) - relZ * Math.sin(player.yaw);
+    const rotZ = relX * Math.sin(player.yaw) + relZ * Math.cos(player.yaw);
+    
+    if (rotZ > 0.1) {
+      const scale = 200 / rotZ;
+      const screenX = canvas.width / 2 + rotX * scale;
+      const screenY = canvas.height * 0.6;
+      
+      objects3D.push({
+        type: 'tree',
+        x: screenX,
+        y: screenY,
+        h: t.h * scale,
+        r: t.r * scale,
+        d: rotZ
+      });
+    }
+  });
+  
+  enemies.forEach(e => {
+    const relX = e.x - player.x;
+    const relZ = e.z - player.z;
+    const rotX = relX * Math.cos(player.yaw) - relZ * Math.sin(player.yaw);
+    const rotZ = relX * Math.sin(player.yaw) + relZ * Math.cos(player.yaw);
+    
+    if (rotZ > 0.1) {
+      const scale = 200 / rotZ;
+      const screenX = canvas.width / 2 + rotX * scale;
+      const screenY = canvas.height * 0.6 - 10 * scale;
+      
+      objects3D.push({
+        type: 'enemy',
+        x: screenX,
+        y: screenY,
+        size: e.size * scale,
+        d: rotZ,
+        health: e.health,
+        maxHealth: e.maxHealth,
+        isElite: e.type === 'elite'
+      });
+    }
+  });
+  
+  items.forEach(item => {
+    if (item.collected) return;
+    const relX = item.x - player.x;
+    const relZ = item.z - player.z;
+    const rotX = relX * Math.cos(player.yaw) - relZ * Math.sin(player.yaw);
+    const rotZ = relX * Math.sin(player.yaw) + relZ * Math.cos(player.yaw);
+    
+    if (rotZ > 0.1) {
+      const scale = 200 / rotZ;
+      const screenX = canvas.width / 2 + rotX * scale;
+      const screenY = canvas.height * 0.6 - 3 * scale;
+      
+      objects3D.push({
+        type: 'item',
+        x: screenX,
+        y: screenY,
+        size: 3 * scale,
+        d: rotZ,
+        itemType: item.type
+      });
+    }
+  });
+  
+  objects3D.sort((a, b) => b.d - a.d);
+  
+  objects3D.forEach(obj => {
+    if (obj.type === 'building') {
+      ctx.fillStyle = obj.color;
+      ctx.fillRect(obj.x - obj.w/2, obj.y, obj.w, obj.h);
+      ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+      ctx.strokeRect(obj.x - obj.w/2, obj.y, obj.w, obj.h);
+    } else if (obj.type === 'tree') {
+      ctx.fillStyle = '#2d1b00';
+      ctx.fillRect(obj.x - 2, obj.y - obj.h * 0.3, 4, obj.h * 0.3);
+      ctx.fillStyle = '#1a5c1a';
+      ctx.beginPath();
+      ctx.arc(obj.x, obj.y - obj.h * 0.5, obj.r, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (obj.type === 'enemy') {
+      ctx.fillStyle = obj.isElite ? '#7c3aed' : '#dc2626';
+      ctx.fillRect(obj.x - obj.size/2, obj.y - obj.size, obj.size, obj.size);
+      ctx.fillStyle = '#000';
+      ctx.fillRect(obj.x - obj.size/2, obj.y - obj.size - 8, obj.size, 4);
+      ctx.fillStyle = '#22c55e';
+      const healthWidth = (obj.health / obj.maxHealth) * obj.size;
+      ctx.fillRect(obj.x - obj.size/2, obj.y - obj.size - 8, healthWidth, 4);
+    } else if (obj.type === 'item') {
+      const colors = {health: '#ef4444', ammo: '#f59e0b', food: '#22c55e', energy: '#3b82f6'};
+      ctx.fillStyle = colors[obj.itemType] || '#fff';
+      ctx.beginPath();
+      ctx.arc(obj.x, obj.y, obj.size, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+  });
+  
+  particles.forEach(p => {
+    const relX = p.x - player.x;
+    const relZ = p.z - player.z;
+    const rotX = relX * Math.cos(player.yaw) - relZ * Math.sin(player.yaw);
+    const rotZ = relX * Math.sin(player.yaw) + relZ * Math.cos(player.yaw);
+    
+    if (rotZ > 0.1) {
+      const scale = 200 / rotZ;
+      const screenX = canvas.width / 2 + rotX * scale;
+      const screenY = canvas.height * 0.6 - p.y * scale;
+      
+      ctx.globalAlpha = p.life;
+      ctx.fillStyle = p.color;
+      ctx.fillRect(screenX - 2, screenY - 2, 4, 4);
+      ctx.globalAlpha = 1;
+    }
+  });
+  
+  renderMinimap();
+  updateUI();
+}
+
+function renderMinimap() {
+  minimapCtx.fillStyle = 'rgba(0,0,0,0.8)';
+  minimapCtx.fillRect(0, 0, 180, 180);
+  
+  const scale = 180 / 200;
+  const centerX = 90;
+  const centerY = 90;
+  
+  buildings.forEach(b => {
+    const rx = (b.x - player.x) * scale + centerX;
+    const rz = (b.z - player.z) * scale + centerY;
+    if (rx > 0 && rx < 180 && rz > 0 && rz < 180) {
+      minimapCtx.fillStyle = '#4a5568';
+      minimapCtx.fillRect(rx - 3, rz - 3, 6, 6);
+    }
+  });
+  
+  enemies.forEach(e => {
+    const rx = (e.x - player.x) * scale + centerX;
+    const rz = (e.z - player.z) * scale + centerY;
+    if (rx > 0 && rx < 180 && rz > 0 && rz < 180) {
+      minimapCtx.fillStyle = e.type === 'elite' ? '#7c3aed' : '#ef4444';
+      minimapCtx.beginPath();
+      minimapCtx.arc(rx, rz, 3, 0, Math.PI * 2);
+      minimapCtx.fill();
+    }
+  });
+  
+  items.forEach(item => {
+    if (item.collected) return;
+    const rx = (item.x - player.x) * scale + centerX;
+    const rz = (item.z - player.z) * scale + centerY;
+    if (rx > 0 && rx < 180 && rz > 0 && rz < 180) {
+      minimapCtx.fillStyle = '#22c55e';
+      minimapCtx.beginPath();
+      minimapCtx.arc(rx, rz, 2, 0, Math.PI * 2);
+      minimapCtx.fill();
+    }
+  });
+  
+  minimapCtx.fillStyle = '#3b82f6';
+  minimapCtx.beginPath();
+  minimapCtx.arc(centerX, centerY, 4, 0, Math.PI * 2);
+  minimapCtx.fill();
+  
+  const dirX = Math.sin(player.yaw) * 10;
+  const dirZ = Math.cos(player.yaw) * 10;
+  minimapCtx.strokeStyle = '#3b82f6';
+  minimapCtx.lineWidth = 2;
+  minimapCtx.beginPath();
+  minimapCtx.moveTo(centerX, centerY);
+  minimapCtx.lineTo(centerX + dirX, centerY + dirZ);
+  minimapCtx.stroke();
+}
+
+function updateUI() {
+  document.getElementById('healthBar').style.width = player.health + '%';
+  document.getElementById('healthText').textContent = Math.round(player.health);
+  document.getElementById('staminaBar').style.width = player.stamina + '%';
+  document.getElementById('staminaText').textContent = Math.round(player.stamina);
+  document.getElementById('survivalBar').style.width = player.survival + '%';
+  document.getElementById('survivalText').textContent = Math.round(player.survival);
+  
+  const minutes = Math.floor(gameTime / 60);
+  const seconds = Math.floor(gameTime % 60);
+  const timerEl = document.getElementById('deathTimer');
+  timerEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  timerEl.className = gameTime < 120 ? 'warning' : '';
+  
+  const riskEl = document.getElementById('riskFactors');
+  riskEl.innerHTML = '<div style="margin-bottom:8px;font-weight:bold;">⚠️ 风险因素</div>';
+  riskFactors.forEach(rf => {
+    riskEl.innerHTML += `<div class="risk-factor">${rf.icon} ${rf.name}</div>`;
+  });
+  
+  document.querySelectorAll('.inv-slot').forEach((slot, i) => {
+    slot.className = 'inv-slot' + (i === player.selectedSlot ? ' active' : '');
+  });
+}
+
+function gameOver(reason) {
+  gameRunning = false;
+  document.getElementById('gameOver').style.display = 'flex';
+  document.getElementById('deathStats').innerHTML = `
+    死亡原因：${reason}<br>
+    生存时间：${Math.round(score)}秒<br>
+    击杀敌人：${kills}<br>
+    最终评分：${Math.round(score * 10 + kills * 100)}
+  `;
+}
+
+function startGame() {
+  document.getElementById('startScreen').style.display = 'none';
+  gameRunning = true;
+  gameTime = 3600;
+  score = 0;
+  kills = 0;
+  player.x = 0;
+  player.y = 0;
+  player.z = 0;
+  player.health = 100;
+  player.stamina = 100;
+  player.survival = 100;
+  initWorld();
+  gameLoop();
+}
+
+function restartGame() {
+  document.getElementById('gameOver').style.display = 'none';
+  startGame();
+}
+
+let lastTime = 0;
+function gameLoop(timestamp = 0) {
+  if (!gameRunning) return;
+  
+  const deltaTime = timestamp - lastTime;
+  lastTime = timestamp;
+  
+  update(deltaTime);
+  render();
+  
+  requestAnimationFrame(gameLoop);
+}
+
+document.addEventListener('keydown', e => {
+  keys[e.key] = true;
+  
+  const num = parseInt(e.key);
+  if (num >= 1 && num <= 8) {
+    player.selectedSlot = num - 1;
+  }
+});
+
+document.addEventListener('keyup', e => {
+  keys[e.key] = false;
+});
+
+document.addEventListener('mousemove', e => {
+  if (!gameRunning) return;
+  player.yaw += e.movementX * 0.002;
+  player.pitch -= e.movementY * 0.002;
+  player.pitch = Math.max(-Math.PI/2, Math.min(Math.PI/2, player.pitch));
+});
+
+document.addEventListener('mousedown', e => {
+  if (e.button === 0) mouseDown = true;
+});
+
+document.addEventListener('mouseup', e => {
+  if (e.button === 0) mouseDown = false;
+});
+
+canvas.addEventListener('click', () => {
+  if (gameRunning) {
+    canvas.requestPointerLock();
+  }
+});
+
+window.addEventListener('resize', () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+</script>
+</body>
+</html>
