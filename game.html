@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>末日生存：死亡倒计时 - 3A游戏原型</title>
+<title>西游记：大闹天宫 - 3A游戏</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { background: #000; overflow: hidden; font-family: 'Segoe UI', sans-serif; cursor: none; }
@@ -46,16 +46,16 @@ canvas { display: block; }
   transition: width 0.3s;
 }
 .health-fill { background: linear-gradient(90deg, #ef4444, #dc2626); }
-.stamina-fill { background: linear-gradient(90deg, #22c55e, #16a34a); }
-.survival-fill { background: linear-gradient(90deg, #3b82f6, #2563eb); }
+.mana-fill { background: linear-gradient(90deg, #3b82f6, #2563eb); }
+.exp-fill { background: linear-gradient(90deg, #f59e0b, #d97706); }
 #deathTimer {
   position: fixed;
   top: 20px;
   right: 20px;
-  color: #ef4444;
+  color: #f59e0b;
   font-size: 48px;
   font-weight: 800;
-  text-shadow: 0 0 20px rgba(239,68,68,0.8);
+  text-shadow: 0 0 20px rgba(245,158,11,0.8);
   font-family: 'Courier New', monospace;
 }
 #deathTimer.warning { animation: pulse 1s infinite; }
@@ -94,15 +94,8 @@ canvas { display: block; }
   cursor: pointer;
   transition: all 0.2s;
 }
-.inv-slot:hover { border-color: #3b82f6; background: rgba(59,130,246,0.2); }
-.inv-slot.active { border-color: #22c55e; background: rgba(34,197,94,0.3); }
-.inv-slot .count {
-  position: absolute;
-  bottom: 2px;
-  right: 4px;
-  font-size: 10px;
-  color: #fff;
-}
+.inv-slot:hover { border-color: #f59e0b; background: rgba(245,158,11,0.2); }
+.inv-slot.active { border-color: #ef4444; background: rgba(239,68,68,0.3); }
 #crosshair {
   position: fixed;
   top: 50%;
@@ -139,7 +132,7 @@ canvas { display: block; }
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #0f172a, #1e293b);
+  background: linear-gradient(135deg, #1a0a0a, #2d1b1b);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -148,39 +141,40 @@ canvas { display: block; }
   cursor: default;
 }
 #startScreen h1 {
-  font-size: 64px;
-  color: #ef4444;
-  text-shadow: 0 0 40px rgba(239,68,68,0.5);
-  margin-bottom: 20px;
-  font-family: 'Impact', sans-serif;
-  letter-spacing: 4px;
+  font-size: 72px;
+  color: #f59e0b;
+  text-shadow: 0 0 40px rgba(245,158,11,0.5);
+  margin-bottom: 10px;
+  font-family: 'STKaiti', 'KaiTi', serif;
+  letter-spacing: 8px;
 }
 #startScreen h2 {
-  font-size: 24px;
-  color: #94a3b8;
+  font-size: 28px;
+  color: #d97706;
   margin-bottom: 40px;
   font-weight: 300;
+  font-family: 'STKaiti', 'KaiTi', serif;
 }
 #startBtn {
   padding: 16px 48px;
   font-size: 20px;
-  background: linear-gradient(135deg, #ef4444, #dc2626);
+  background: linear-gradient(135deg, #f59e0b, #d97706);
   color: #fff;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
-  letter-spacing: 2px;
+  letter-spacing: 4px;
   transition: all 0.3s;
-  box-shadow: 0 4px 20px rgba(239,68,68,0.4);
+  box-shadow: 0 4px 20px rgba(245,158,11,0.4);
 }
 #startBtn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(239,68,68,0.6);
+  box-shadow: 0 8px 30px rgba(245,158,11,0.6);
 }
 .controls-info {
   margin-top: 40px;
-  color: #64748b;
+  color: #94a3b8;
   font-size: 14px;
   text-align: center;
   line-height: 2;
@@ -209,6 +203,7 @@ canvas { display: block; }
   font-size: 72px;
   color: #ef4444;
   margin-bottom: 20px;
+  font-family: 'STKaiti', 'KaiTi', serif;
 }
 #gameOver .stats {
   color: #94a3b8;
@@ -220,7 +215,7 @@ canvas { display: block; }
 #restartBtn {
   padding: 16px 48px;
   font-size: 20px;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  background: linear-gradient(135deg, #f59e0b, #d97706);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -239,20 +234,32 @@ canvas { display: block; }
   transition: opacity 0.3s;
   pointer-events: none;
 }
-#riskFactors {
+#skillBar {
   position: fixed;
-  top: 120px;
-  left: 20px;
-  color: #f59e0b;
-  font-size: 12px;
-  max-width: 200px;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
 }
-.risk-factor {
-  margin-bottom: 4px;
-  padding: 4px 8px;
-  background: rgba(245,158,11,0.1);
-  border-left: 3px solid #f59e0b;
+.skill-slot {
+  width: 60px;
+  height: 60px;
+  background: rgba(0,0,0,0.7);
+  border: 2px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
 }
+.skill-slot:hover { border-color: #f59e0b; }
+.skill-slot.active { border-color: #ef4444; background: rgba(239,68,68,0.3); }
+.skill-slot .skill-icon { font-size: 24px; }
+.skill-slot .skill-key { font-size: 10px; color: #94a3b8; }
+.skill-slot .skill-cd { font-size: 10px; color: #ef4444; }
 </style>
 </head>
 <body>
@@ -266,32 +273,50 @@ canvas { display: block; }
       <span id="healthText">100</span>
     </div>
     <div class="hud-item">
-      <span>⚡ 体力</span>
-      <div class="hud-bar"><div class="hud-bar-fill stamina-fill" id="staminaBar" style="width:100%"></div></div>
-      <span id="staminaText">100</span>
+      <span>💧 法力</span>
+      <div class="hud-bar"><div class="hud-bar-fill mana-fill" id="manaBar" style="width:100%"></div></div>
+      <span id="manaText">100</span>
     </div>
     <div class="hud-item">
-      <span>🛡️ 生存</span>
-      <div class="hud-bar"><div class="hud-bar-fill survival-fill" id="survivalBar" style="width:100%"></div></div>
-      <span id="survivalText">100</span>
+      <span>⭐ 经验</span>
+      <div class="hud-bar"><div class="hud-bar-fill exp-fill" id="expBar" style="width:0%"></div></div>
+      <span id="expText">0</span>
     </div>
   </div>
   
-  <div id="deathTimer">59:59</div>
-  
-  <div id="riskFactors"></div>
+  <div id="deathTimer">取经倒计时</div>
   
   <canvas id="minimap"></canvas>
   
+  <div id="skillBar">
+    <div class="skill-slot active" data-skill="0">
+      <span class="skill-icon">棒</span>
+      <span class="skill-key">1</span>
+    </div>
+    <div class="skill-slot" data-skill="1">
+      <span class="skill-icon">🔥</span>
+      <span class="skill-key">2</span>
+    </div>
+    <div class="skill-slot" data-skill="2">
+      <span class="skill-icon">⚡</span>
+      <span class="skill-key">3</span>
+    </div>
+    <div class="skill-slot" data-skill="3">
+      <span class="skill-icon">🌀</span>
+      <span class="skill-key">4</span>
+    </div>
+    <div class="skill-slot" data-skill="4">
+      <span class="skill-icon">🐒</span>
+      <span class="skill-key">5</span>
+    </div>
+  </div>
+  
   <div id="inventory">
-    <div class="inv-slot active" data-slot="0">🔫</div>
-    <div class="inv-slot" data-slot="1">💊</div>
-    <div class="inv-slot" data-slot="2">🍖</div>
-    <div class="inv-slot" data-slot="3">🔋</div>
-    <div class="inv-slot" data-slot="4">📦</div>
-    <div class="inv-slot" data-slot="5">🔧</div>
-    <div class="inv-slot" data-slot="6">🎯</div>
-    <div class="inv-slot" data-slot="7">💀</div>
+    <div class="inv-slot active" data-slot="0">🪄</div>
+    <div class="inv-slot" data-slot="1">🍑</div>
+    <div class="inv-slot" data-slot="2">🍶</div>
+    <div class="inv-slot" data-slot="3">📿</div>
+    <div class="inv-slot" data-slot="4">🎁</div>
   </div>
   
   <div id="crosshair"></div>
@@ -299,18 +324,18 @@ canvas { display: block; }
 </div>
 
 <div id="startScreen">
-  <h1>末日生存</h1>
-  <h2>DEATH COUNTDOWN</h2>
-  <button id="startBtn" onclick="startGame()">开始生存</button>
+  <h1>西游记</h1>
+  <h2>大闹天宫</h2>
+  <button id="startBtn" onclick="startGame()">开始取经</button>
   <div class="controls-info">
     <span>WASD</span> 移动 | <span>鼠标</span> 视角 | <span>左键</span> 攻击<br>
-    <span>E</span> 拾取 | <span>R</span> 换弹 | <span>Space</span> 跳跃<br>
-    <span>1-8</span> 切换装备 | <span>Shift</span> 冲刺
+    <span>1-5</span> 技能 | <span>E</span> 拾取 | <span>Space</span> 跳跃<br>
+    <span>Shift</span> 筋斗云 | <span>R</span> 七十二变
   </div>
 </div>
 
 <div id="gameOver">
-  <h1>你已死亡</h1>
+  <h1>取经失败</h1>
   <div class="stats" id="deathStats"></div>
   <button id="restartBtn" onclick="restartGame()">重新开始</button>
 </div>
@@ -321,15 +346,21 @@ const ctx = canvas.getContext('2d');
 const minimapCanvas = document.getElementById('minimap');
 const minimapCtx = minimapCanvas.getContext('2d');
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+const PIXEL_RATIO = window.devicePixelRatio || 1;
+canvas.width = window.innerWidth * PIXEL_RATIO;
+canvas.height = window.innerHeight * PIXEL_RATIO;
+canvas.style.width = window.innerWidth + 'px';
+canvas.style.height = window.innerHeight + 'px';
+ctx.scale(PIXEL_RATIO, PIXEL_RATIO);
+
 minimapCanvas.width = 180;
 minimapCanvas.height = 180;
 
 let gameRunning = false;
-let gameTime = 3600;
+let gameTime = 7200;
 let score = 0;
 let kills = 0;
+let level = 1;
 
 const player = {
   x: 0,
@@ -341,269 +372,240 @@ const player = {
   yaw: 0,
   pitch: 0,
   health: 100,
-  stamina: 100,
-  survival: 100,
-  speed: 0.15,
-  sprintSpeed: 0.25,
+  maxHealth: 100,
+  mana: 100,
+  maxMana: 100,
+  exp: 0,
+  maxExp: 100,
+  speed: 0.18,
+  sprintSpeed: 0.35,
   isSprinting: false,
   isJumping: false,
-  jumpForce: 0.15,
+  jumpForce: 0.18,
   gravity: 0.008,
-  selectedSlot: 0,
+  selectedSkill: 0,
+  skills: [
+    {name: '金箍棒', icon: '棒', cooldown: 0, maxCooldown: 500, damage: 30, manaCost: 0},
+    {name: '三昧真火', icon: '🔥', cooldown: 0, maxCooldown: 3000, damage: 80, manaCost: 30},
+    {name: '雷击', icon: '⚡', cooldown: 0, maxCooldown: 5000, damage: 120, manaCost: 50},
+    {name: '定身术', icon: '🌀', cooldown: 0, maxCooldown: 8000, damage: 0, manaCost: 40},
+    {name: '七十二变', icon: '🐒', cooldown: 0, maxCooldown: 15000, damage: 200, manaCost: 80}
+  ],
   inventory: [
-    {name: '手枪', icon: '🔫', ammo: 12, maxAmmo: 12},
-    {name: '医疗包', icon: '💊', count: 3},
-    {name: '食物', icon: '🍖', count: 5},
-    {name: '电池', icon: '🔋', count: 2},
-    {name: '补给箱', icon: '📦', count: 1},
-    {name: '工具', icon: '🔧', count: 1},
-    {name: '陷阱', icon: '🎯', count: 3},
-    {name: '解毒剂', icon: '💀', count: 1}
-  ]
+    {name: '金箍棒', icon: '🪄'},
+    {name: '蟠桃', icon: '🍑', count: 5},
+    {name: '仙酒', icon: '🍶', count: 3},
+    {name: '佛珠', icon: '📿', count: 1},
+    {name: '宝箱', icon: '🎁', count: 2}
+  ],
+  transform: null,
+  transformTimer: 0
 };
 
 const keys = {};
 let mouseDown = false;
 let lastShot = 0;
 
-const WORLD_SIZE = 500;
-const CELL_SIZE = 50;
+const WORLD_SIZE = 600;
 
-const riskFactors = [
-  {name: '辐射暴露', icon: '☢️', effect: '体力-20%'},
-  {name: '病毒感染', icon: '🦠', effect: '生命-15%'},
-  {name: '营养不良', icon: '🍽️', effect: '生存-10%'},
-  {name: '心理压力', icon: '😰', effect: '全属性-5%'},
-  {name: '环境污染', icon: '🏭', effect: '生命-10%'}
-];
-
-let enemies = [];
-let items = [];
-let particles = [];
-let buildings = [];
-let trees = [];
-let bloodStains = [];
-let explosionEffects = [];
-let smokeEffects = [];
-let fireEffects = [];
+const demons = [];
+const items = [];
+const particles = [];
+const buildings = [];
+const trees = [];
+const clouds = [];
+const mountains = [];
 
 function initWorld() {
-  buildings = [];
-  trees = [];
-  enemies = [];
-  items = [];
-  bloodStains = [];
-  explosionEffects = [];
-  smokeEffects = [];
-  fireEffects = [];
+  buildings.length = 0;
+  trees.length = 0;
+  demons.length = 0;
+  items.length = 0;
+  clouds.length = 0;
+  mountains.length = 0;
   
-  // 创建更多样化的建筑
-  for (let i = 0; i < 50; i++) {
+  // 天宫建筑
+  for (let i = 0; i < 40; i++) {
     const type = Math.random();
     let building;
     if (type < 0.3) {
-      // 废墟
+      // 天宫宫殿
       building = {
         x: (Math.random() - 0.5) * WORLD_SIZE,
         z: (Math.random() - 0.5) * WORLD_SIZE,
-        w: 15 + Math.random() * 25,
-        h: 10 + Math.random() * 20,
-        d: 15 + Math.random() * 25,
-        color: `hsl(${20 + Math.random() * 10}, ${30 + Math.random() * 20}%, ${25 + Math.random() * 15}%)`,
-        type: 'ruin',
-        damage: Math.random() * 0.5,
-        debris: Math.random() * 5
+        w: 30 + Math.random() * 50,
+        h: 40 + Math.random() * 60,
+        d: 30 + Math.random() * 50,
+        color: `hsl(${30 + Math.random() * 20}, ${60 + Math.random() * 20}%, ${50 + Math.random() * 20}%)`,
+        type: 'palace',
+        hasRoof: true,
+        roofColor: '#dc2626',
+        pillars: Math.floor(Math.random() * 4) + 2
       };
     } else if (type < 0.6) {
-      // 工厂
-      building = {
-        x: (Math.random() - 0.5) * WORLD_SIZE,
-        z: (Math.random() - 0.5) * WORLD_SIZE,
-        w: 30 + Math.random() * 40,
-        h: 20 + Math.random() * 30,
-        d: 30 + Math.random() * 40,
-        color: `hsl(${210 + Math.random() * 20}, ${15 + Math.random() * 10}%, ${30 + Math.random() * 15}%)`,
-        type: 'factory',
-        hasSmoke: Math.random() > 0.5,
-        hasChimney: Math.random() > 0.5
-      };
-    } else {
-      // 普通建筑
+      // 蟠桃园
       building = {
         x: (Math.random() - 0.5) * WORLD_SIZE,
         z: (Math.random() - 0.5) * WORLD_SIZE,
         w: 20 + Math.random() * 30,
-        h: 25 + Math.random() * 40,
+        h: 15 + Math.random() * 25,
         d: 20 + Math.random() * 30,
-        color: `hsl(${200 + Math.random() * 20}, ${20 + Math.random() * 10}%, ${35 + Math.random() * 20}%)`,
-        type: 'building',
-        windows: Math.floor(Math.random() * 4) + 1,
-        hasRoof: Math.random() > 0.3
+        color: '#8b4513',
+        type: 'garden',
+        hasTree: true,
+        treeCount: Math.floor(Math.random() * 5) + 3
+      };
+    } else {
+      // 练丹炉
+      building = {
+        x: (Math.random() - 0.5) * WORLD_SIZE,
+        z: (Math.random() - 0.5) * WORLD_SIZE,
+        w: 15 + Math.random() * 20,
+        h: 20 + Math.random() * 30,
+        d: 15 + Math.random() * 20,
+        color: '#666',
+        type: 'furnace',
+        hasFire: true,
+        fireIntensity: Math.random()
       };
     }
     buildings.push(building);
   }
   
-  // 创建更多样化的树木
-  for (let i = 0; i < 200; i++) {
-    const treeType = Math.random();
-    let tree;
-    if (treeType < 0.5) {
-      // 普通树
-      tree = {
-        x: (Math.random() - 0.5) * WORLD_SIZE,
-        z: (Math.random() - 0.5) * WORLD_SIZE,
-        h: 15 + Math.random() * 25,
-        r: 3 + Math.random() * 5,
-        type: 'normal',
-        color: `hsl(${100 + Math.random() * 40}, ${50 + Math.random() * 30}%, ${25 + Math.random() * 20}%)`,
-        leaves: Math.floor(Math.random() * 3) + 2
-      };
-    } else if (treeType < 0.7) {
-      // 枯树
-      tree = {
-        x: (Math.random() - 0.5) * WORLD_SIZE,
-        z: (Math.random() - 0.5) * WORLD_SIZE,
-        h: 10 + Math.random() * 15,
-        r: 2 + Math.random() * 3,
-        type: 'dead',
-        color: `hsl(${30 + Math.random() * 20}, ${20 + Math.random() * 10}%, ${30 + Math.random() * 15}%)`,
-        branches: Math.floor(Math.random() * 4) + 2
-      };
-    } else if (treeType < 0.85) {
-      // 灌木
-      tree = {
-        x: (Math.random() - 0.5) * WORLD_SIZE,
-        z: (Math.random() - 0.5) * WORLD_SIZE,
-        h: 3 + Math.random() * 5,
-        r: 4 + Math.random() * 6,
-        type: 'bush',
-        color: `hsl(${80 + Math.random() * 40}, ${40 + Math.random() * 30}%, ${30 + Math.random() * 20}%)`
-      };
-    } else {
-      // 仙人掌
-      tree = {
-        x: (Math.random() - 0.5) * WORLD_SIZE,
-        z: (Math.random() - 0.5) * WORLD_SIZE,
-        h: 8 + Math.random() * 12,
-        r: 1.5 + Math.random() * 2,
-        type: 'cactus',
-        color: `hsl(${120 + Math.random() * 20}, ${60 + Math.random() * 20}%, ${30 + Math.random() * 15}%)`
-      };
-    }
-    trees.push(tree);
-  }
-  
-  // 创建敌人
-  for (let i = 0; i < 30; i++) {
-    spawnEnemy();
-  }
-  
-  // 创建物品
-  for (let i = 0; i < 50; i++) {
-    spawnItem();
-  }
-  
-  // 创建烟雾效果
-  for (let i = 0; i < 10; i++) {
-    smokeEffects.push({
-      x: (Math.random() - 0.5) * WORLD_SIZE * 0.5,
-      y: 20 + Math.random() * 30,
-      z: (Math.random() - 0.5) * WORLD_SIZE * 0.5,
-      size: 10 + Math.random() * 20,
-      speed: 0.02 + Math.random() * 0.03,
-      life: 1,
-      opacity: 0.3 + Math.random() * 0.3
+  // 仙树
+  for (let i = 0; i < 150; i++) {
+    trees.push({
+      x: (Math.random() - 0.5) * WORLD_SIZE,
+      z: (Math.random() - 0.5) * WORLD_SIZE,
+      h: 20 + Math.random() * 30,
+      r: 5 + Math.random() * 8,
+      type: Math.random() > 0.7 ? 'peach' : 'normal',
+      color: `hsl(${120 + Math.random() * 40}, ${60 + Math.random() * 30}%, ${35 + Math.random() * 20}%)`,
+      hasFruit: Math.random() > 0.5,
+      glow: Math.random() * Math.PI * 2
     });
+  }
+  
+  // 云朵
+  for (let i = 0; i < 30; i++) {
+    clouds.push({
+      x: (Math.random() - 0.5) * WORLD_SIZE * 2,
+      y: 80 + Math.random() * 100,
+      z: (Math.random() - 0.5) * WORLD_SIZE * 2,
+      size: 30 + Math.random() * 50,
+      speed: 0.01 + Math.random() * 0.02,
+      opacity: 0.3 + Math.random() * 0.4
+    });
+  }
+  
+  // 远山
+  for (let i = 0; i < 8; i++) {
+    mountains.push({
+      x: (Math.random() - 0.5) * WORLD_SIZE * 3,
+      z: (Math.random() - 0.5) * WORLD_SIZE * 3,
+      h: 100 + Math.random() * 200,
+      w: 80 + Math.random() * 120,
+      color: `hsl(${200 + Math.random() * 30}, ${20 + Math.random() * 10}%, ${30 + Math.random() * 15}%)`
+    });
+  }
+  
+  // 妖怪
+  for (let i = 0; i < 30; i++) {
+    spawnDemon();
+  }
+  
+  // 物品
+  for (let i = 0; i < 40; i++) {
+    spawnItem();
   }
 }
 
-function spawnEnemy() {
+function spawnDemon() {
   const angle = Math.random() * Math.PI * 2;
-  const dist = 50 + Math.random() * 150;
+  const dist = 80 + Math.random() * 200;
   const type = Math.random();
-  let enemy;
+  let demon;
   
-  if (type < 0.5) {
-    // 普通僵尸
-    enemy = {
+  if (type < 0.4) {
+    // 小妖
+    demon = {
       x: player.x + Math.cos(angle) * dist,
       y: 0,
       z: player.z + Math.sin(angle) * dist,
-      health: 30 + Math.random() * 40,
+      health: 40 + Math.random() * 30,
       maxHealth: 70,
       speed: 0.03 + Math.random() * 0.04,
-      damage: 5 + Math.random() * 10,
-      type: 'zombie',
+      damage: 8 + Math.random() * 12,
+      type: 'imp',
+      name: '小妖',
       lastAttack: 0,
       size: 8,
       color: '#8b0000',
-      animation: Math.random() * Math.PI * 2,
-      limbAnimation: Math.random() * Math.PI * 2
+      animation: Math.random() * Math.PI * 2
     };
-  } else if (type < 0.75) {
-    // 变异体
-    enemy = {
+  } else if (type < 0.7) {
+    // 妖怪
+    demon = {
       x: player.x + Math.cos(angle) * dist,
       y: 0,
       z: player.z + Math.sin(angle) * dist,
-      health: 60 + Math.random() * 40,
-      maxHealth: 100,
+      health: 80 + Math.random() * 60,
+      maxHealth: 140,
       speed: 0.04 + Math.random() * 0.06,
-      damage: 10 + Math.random() * 15,
-      type: 'mutant',
+      damage: 15 + Math.random() * 20,
+      type: 'demon',
+      name: '妖怪',
       lastAttack: 0,
-      size: 10,
+      size: 12,
       color: '#4a0080',
       animation: Math.random() * Math.PI * 2,
-      limbAnimation: Math.random() * Math.PI * 2,
-      hasTentacles: Math.random() > 0.5
+      hasMagic: Math.random() > 0.5
     };
   } else if (type < 0.9) {
-    // 精英怪
-    enemy = {
+    // 大妖
+    demon = {
       x: player.x + Math.cos(angle) * dist,
       y: 0,
       z: player.z + Math.sin(angle) * dist,
-      health: 100 + Math.random() * 100,
-      maxHealth: 200,
-      speed: 0.05 + Math.random() * 0.08,
-      damage: 15 + Math.random() * 25,
-      type: 'elite',
+      health: 150 + Math.random() * 100,
+      maxHealth: 250,
+      speed: 0.05 + Math.random() * 0.07,
+      damage: 25 + Math.random() * 30,
+      type: 'great_demon',
+      name: '大妖',
       lastAttack: 0,
-      size: 14,
+      size: 16,
       color: '#ff4500',
       animation: Math.random() * Math.PI * 2,
-      limbAnimation: Math.random() * Math.PI * 2,
-      hasShield: Math.random() > 0.5,
-      hasWeapon: Math.random() > 0.5
+      hasShield: Math.random() > 0.4,
+      shieldGlow: 0
     };
   } else {
-    // Boss
-    enemy = {
+    // 妖王
+    demon = {
       x: player.x + Math.cos(angle) * dist,
       y: 0,
       z: player.z + Math.sin(angle) * dist,
-      health: 300 + Math.random() * 200,
-      maxHealth: 500,
-      speed: 0.03 + Math.random() * 0.04,
-      damage: 25 + Math.random() * 35,
-      type: 'boss',
+      health: 400 + Math.random() * 300,
+      maxHealth: 700,
+      speed: 0.04 + Math.random() * 0.05,
+      damage: 40 + Math.random() * 50,
+      type: 'demon_king',
+      name: '妖王',
       lastAttack: 0,
-      size: 20,
+      size: 24,
       color: '#8b0000',
       animation: Math.random() * Math.PI * 2,
-      limbAnimation: Math.random() * Math.PI * 2,
       hasShield: true,
-      hasWeapon: true,
-      attackCooldown: 0
+      hasMagic: true,
+      aura: 0
     };
   }
-  enemies.push(enemy);
+  demons.push(demon);
 }
 
 function spawnItem() {
-  const types = ['health', 'ammo', 'food', 'energy', 'weapon', 'armor', 'special'];
+  const types = ['health', 'mana', 'exp', 'peach', 'wine', 'treasure'];
   const type = types[Math.floor(Math.random() * types.length)];
   items.push({
     x: (Math.random() - 0.5) * WORLD_SIZE * 0.8,
@@ -612,7 +614,7 @@ function spawnItem() {
     type: type,
     collected: false,
     glow: Math.random() * Math.PI * 2,
-    floatAnimation: Math.random() * Math.PI * 2
+    float: Math.random() * Math.PI * 2
   });
 }
 
@@ -621,7 +623,7 @@ function update(deltaTime) {
   
   gameTime -= deltaTime / 1000;
   if (gameTime <= 0) {
-    gameOver('时间耗尽，末日降临...');
+    gameOver('取经时间耗尽...');
     return;
   }
   
@@ -655,13 +657,13 @@ function update(deltaTime) {
   }
   
   if (player.isSprinting && (dx !== 0 || dz !== 0)) {
-    player.stamina = Math.max(0, player.stamina - 0.2);
+    player.mana = Math.max(0, player.mana - 0.3);
   } else {
-    player.stamina = Math.min(100, player.stamina + 0.1);
+    player.mana = Math.min(player.maxMana, player.mana + 0.15);
   }
   
   if (keys['Shift'] || keys['shift']) {
-    player.isSprinting = player.stamina > 10;
+    player.isSprinting = player.mana > 15;
   } else {
     player.isSprinting = false;
   }
@@ -671,44 +673,61 @@ function update(deltaTime) {
     player.vy = player.jumpForce;
   }
   
-  // 更新敌人
-  enemies.forEach(enemy => {
-    const dx = player.x - enemy.x;
-    const dz = player.z - enemy.z;
-    const dist = Math.sqrt(dx * dx + dz * dz);
-    
-    enemy.animation += 0.05;
-    enemy.limbAnimation += 0.08;
-    
-    if (dist > 2) {
-      enemy.x += (dx / dist) * enemy.speed;
-      enemy.z += (dz / dist) * enemy.speed;
-    } else {
-      const now = Date.now();
-      if (now - enemy.lastAttack > 1000) {
-        player.health -= enemy.damage;
-        enemy.lastAttack = now;
-        showMessage(`受到攻击！-${enemy.damage.toFixed(0)}生命`);
-        createParticles(player.x, player.y + 10, player.z, '#ef4444', 12);
-        createBloodStain(player.x, player.z);
-      }
-    }
-    
-    if (dist > 250) {
-      const angle = Math.random() * Math.PI * 2;
-      enemy.x = player.x + Math.cos(angle) * 120;
-      enemy.z = player.z + Math.sin(angle) * 120;
-    }
-    
-    // Boss特殊攻击
-    if (enemy.type === 'boss' && enemy.attackCooldown > 0) {
-      enemy.attackCooldown -= deltaTime;
+  // 技能冷却
+  player.skills.forEach(skill => {
+    if (skill.cooldown > 0) {
+      skill.cooldown -= deltaTime;
     }
   });
   
-  // 射击
+  // 变身计时
+  if (player.transform) {
+    player.transformTimer -= deltaTime;
+    if (player.transformTimer <= 0) {
+      player.transform = null;
+      showMessage('变身结束');
+    }
+  }
+  
+  // 更新妖怪
+  demons.forEach(demon => {
+    const dx = player.x - demon.x;
+    const dz = player.z - demon.z;
+    const dist = Math.sqrt(dx * dx + dz * dz);
+    
+    demon.animation += 0.04;
+    
+    if (dist > 3) {
+      demon.x += (dx / dist) * demon.speed;
+      demon.z += (dz / dist) * demon.speed;
+    } else {
+      const now = Date.now();
+      if (now - demon.lastAttack > 1200) {
+        const damage = player.transform ? demon.damage * 0.5 : demon.damage;
+        player.health -= damage;
+        demon.lastAttack = now;
+        showMessage(`受到${demon.name}攻击！-${damage.toFixed(0)}生命`);
+        createParticles(player.x, player.y + 10, player.z, '#ef4444', 12);
+      }
+    }
+    
+    if (dist > 350) {
+      const angle = Math.random() * Math.PI * 2;
+      demon.x = player.x + Math.cos(angle) * 180;
+      demon.z = player.z + Math.sin(angle) * 180;
+    }
+    
+    if (demon.type === 'great_demon' || demon.type === 'demon_king') {
+      demon.shieldGlow = (demon.shieldGlow || 0) + 0.05;
+    }
+    if (demon.type === 'demon_king') {
+      demon.aura = (demon.aura || 0) + 0.03;
+    }
+  });
+  
+  // 攻击
   if (mouseDown && Date.now() - lastShot > 300) {
-    shoot();
+    attack();
     lastShot = Date.now();
   }
   
@@ -719,206 +738,331 @@ function update(deltaTime) {
     const dz = player.z - item.z;
     const dist = Math.sqrt(dx * dx + dz * dz);
     
-    item.glow += 0.05;
-    item.floatAnimation += 0.03;
+    item.glow += 0.04;
+    item.float += 0.02;
     
-    if (dist < 3 && keys['e']) {
+    if (dist < 4 && keys['e']) {
       item.collected = true;
       collectItem(item);
     }
   });
   
   // 更新粒子
-  particles = particles.filter(p => p.life > 0);
-  particles.forEach(p => {
+  particles.filter(p => p.life > 0).forEach(p => {
     p.x += p.vx;
     p.y += p.vy;
     p.z += p.vz;
-    p.vy -= 0.01;
-    p.life -= 0.02;
-    p.size *= 0.98;
+    p.vy -= 0.008;
+    p.life -= 0.015;
+    p.size *= 0.99;
     p.rotation += p.rotSpeed;
   });
   
-  // 更新血迹
-  bloodStains = bloodStains.filter(b => b.life > 0);
-  bloodStains.forEach(b => {
-    b.life -= 0.001;
-    b.size *= 1.001;
+  // 更新云朵
+  clouds.forEach(c => {
+    c.x += c.speed;
+    if (c.x > WORLD_SIZE) c.x = -WORLD_SIZE;
   });
   
-  // 更新爆炸效果
-  explosionEffects = explosionEffects.filter(e => e.life > 0);
-  explosionEffects.forEach(e => {
-    e.radius += 0.8;
-    e.life -= 0.03;
-    e.particles.forEach(p => {
-      p.x += p.vx;
-      p.y += p.vy;
-      p.z += p.vz;
-      p.vy -= 0.02;
-      p.life -= 0.04;
-    });
+  // 更新树木发光
+  trees.forEach(t => {
+    t.glow += 0.02;
   });
   
-  // 更新烟雾效果
-  smokeEffects.forEach(s => {
-    s.y += s.speed;
-    s.life -= 0.005;
-    s.size += 0.1;
-    if (s.life <= 0) {
-      s.y = 20 + Math.random() * 30;
-      s.life = 1;
-      s.size = 10 + Math.random() * 20;
-    }
-  });
+  player.health = Math.max(0, Math.min(player.maxHealth, player.health - 0.005));
   
-  player.health = Math.max(0, Math.min(100, player.health - 0.01));
-  player.survival = Math.max(0, Math.min(100, player.survival - 0.02));
-  
-  if (player.health <= 0 || player.survival <= 0) {
-    gameOver(player.health <= 0 ? '生命值耗尽' : '生存指数归零');
+  if (player.health <= 0) {
+    gameOver('被妖怪打败了...');
   }
   
   score += deltaTime / 1000;
   
-  if (enemies.length < 25) spawnEnemy();
+  if (demons.length < 25) spawnDemon();
   if (items.filter(i => !i.collected).length < 20) spawnItem();
 }
 
-function shoot() {
-  const item = player.inventory[player.selectedSlot];
-  if (item.name === '手枪' && item.ammo > 0) {
-    item.ammo--;
-    
-    // 创建枪口闪光
-    createMuzzleFlash();
-    
-    for (let i = 0; i < enemies.length; i++) {
-      const enemy = enemies[i];
-      const dx = enemy.x - player.x;
-      const dy = (enemy.y + 10) - (player.y + 10);
-      const dz = enemy.z - player.z;
-      const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+function attack() {
+  const skill = player.skills[player.selectedSkill];
+  
+  if (skill.cooldown > 0) {
+    showMessage('技能冷却中...');
+    return;
+  }
+  
+  if (player.mana < skill.manaCost) {
+    showMessage('法力不足！');
+    return;
+  }
+  
+  player.mana -= skill.manaCost;
+  skill.cooldown = skill.maxCooldown;
+  
+  if (skill.name === '金箍棒') {
+    // 近战攻击
+    createMaceEffect();
+    demons.forEach((demon, i) => {
+      const dx = demon.x - player.x;
+      const dz = demon.z - player.z;
+      const dist = Math.sqrt(dx * dx + dz * dz);
       
-      const nx = dx / dist;
-      const nz = dz / dist;
-      
-      const viewX = Math.sin(player.yaw);
-      const viewZ = Math.cos(player.yaw);
-      
-      const dot = nx * viewX + nz * viewZ;
-      
-      if (dot > 0.95 && dist < 80) {
-        enemy.health -= 25;
-        createParticles(enemy.x, enemy.y + 10, enemy.z, '#ef4444', 15);
-        createBloodStain(enemy.x, enemy.z);
+      if (dist < 15) {
+        const damage = player.transform ? skill.damage * 2 : skill.damage;
+        demon.health -= damage;
+        createParticles(demon.x, demon.y + 10, demon.z, '#f59e0b', 15);
         
-        if (enemy.health <= 0) {
-          createExplosion(enemy.x, enemy.y + 10, enemy.z);
-          enemies.splice(i, 1);
+        if (demon.health <= 0) {
+          createExplosion(demon.x, demon.y + 10, demon.z, '#f59e0b');
+          demons.splice(i, 1);
           kills++;
           score += 100;
+          player.exp += 20;
+          checkLevelUp();
           showMessage('+100 击杀奖励');
           spawnItem();
         }
-        break;
       }
-    }
+    });
+  } else if (skill.name === '三昧真火') {
+    // 火焰攻击
+    createFireEffect();
+    demons.forEach((demon, i) => {
+      const dx = demon.x - player.x;
+      const dz = demon.z - player.z;
+      const dist = Math.sqrt(dx * dx + dz * dz);
+      const nx = dx / dist;
+      const nz = dz / dist;
+      const viewX = Math.sin(player.yaw);
+      const viewZ = Math.cos(player.yaw);
+      const dot = nx * viewX + nz * viewZ;
+      
+      if (dot > 0.8 && dist < 60) {
+        const damage = player.transform ? skill.damage * 2 : skill.damage;
+        demon.health -= damage;
+        createParticles(demon.x, demon.y + 10, demon.z, '#ff4500', 20);
+        
+        if (demon.health <= 0) {
+          createExplosion(demon.x, demon.y + 10, demon.z, '#ff4500');
+          demons.splice(i, 1);
+          kills++;
+          score += 150;
+          player.exp += 30;
+          checkLevelUp();
+          showMessage('+150 击杀奖励');
+          spawnItem();
+        }
+      }
+    });
+  } else if (skill.name === '雷击') {
+    // 雷电攻击
+    createLightningEffect();
+    demons.forEach((demon, i) => {
+      const dx = demon.x - player.x;
+      const dz = demon.z - player.z;
+      const dist = Math.sqrt(dx * dx + dz * dz);
+      
+      if (dist < 80) {
+        const damage = player.transform ? skill.damage * 2 : skill.damage;
+        demon.health -= damage;
+        createParticles(demon.x, demon.y + 10, demon.z, '#ffff00', 25);
+        
+        if (demon.health <= 0) {
+          createExplosion(demon.x, demon.y + 10, demon.z, '#ffff00');
+          demons.splice(i, 1);
+          kills++;
+          score += 200;
+          player.exp += 40;
+          checkLevelUp();
+          showMessage('+200 击杀奖励');
+          spawnItem();
+        }
+      }
+    });
+  } else if (skill.name === '定身术') {
+    // 定身
+    createFreezeEffect();
+    demons.forEach(demon => {
+      const dx = demon.x - player.x;
+      const dz = demon.z - player.z;
+      const dist = Math.sqrt(dx * dx + dz * dz);
+      
+      if (dist < 50) {
+        demon.speed *= 0.1;
+        demon.frozen = true;
+        setTimeout(() => {
+          demon.speed *= 10;
+          demon.frozen = false;
+        }, 3000);
+      }
+    });
+  } else if (skill.name === '七十二变') {
+    // 变身
+    player.transform = 'golden_monkey';
+    player.transformTimer = 10000;
+    showMessage('七十二变！变身金猴王！');
+    createTransformEffect();
   }
 }
 
-function createMuzzleFlash() {
-  for (let i = 0; i < 8; i++) {
+function createMaceEffect() {
+  for (let i = 0; i < 15; i++) {
     particles.push({
-      x: player.x + Math.sin(player.yaw) * 5,
+      x: player.x + Math.sin(player.yaw) * 8,
       y: player.y + 10,
-      z: player.z + Math.cos(player.yaw) * 5,
-      vx: Math.sin(player.yaw) * 0.8 + (Math.random() - 0.5) * 0.4,
-      vy: 0.2 + Math.random() * 0.3,
-      vz: Math.cos(player.yaw) * 0.8 + (Math.random() - 0.5) * 0.4,
-      color: Math.random() > 0.5 ? '#ffff00' : '#ff8c00',
-      life: 0.4,
-      size: 3 + Math.random() * 2,
+      z: player.z + Math.cos(player.yaw) * 8,
+      vx: Math.sin(player.yaw) * 0.8 + (Math.random() - 0.5) * 0.5,
+      vy: 0.3 + Math.random() * 0.4,
+      vz: Math.cos(player.yaw) * 0.8 + (Math.random() - 0.5) * 0.5,
+      color: '#f59e0b',
+      life: 0.6,
+      size: 4 + Math.random() * 3,
+      rotation: Math.random() * Math.PI * 2,
+      rotSpeed: (Math.random() - 0.5) * 0.3
+    });
+  }
+}
+
+function createFireEffect() {
+  for (let i = 0; i < 25; i++) {
+    particles.push({
+      x: player.x + Math.sin(player.yaw) * 10,
+      y: player.y + 12,
+      z: player.z + Math.cos(player.yaw) * 10,
+      vx: Math.sin(player.yaw) * 1.2 + (Math.random() - 0.5) * 0.6,
+      vy: 0.4 + Math.random() * 0.5,
+      vz: Math.cos(player.yaw) * 1.2 + (Math.random() - 0.5) * 0.6,
+      color: Math.random() > 0.5 ? '#ff4500' : '#ff8c00',
+      life: 0.8,
+      size: 5 + Math.random() * 4,
       rotation: Math.random() * Math.PI * 2,
       rotSpeed: (Math.random() - 0.5) * 0.2
     });
   }
 }
 
-function createBloodStain(x, z) {
-  bloodStains.push({
-    x: x,
-    z: z,
-    size: 2 + Math.random() * 4,
-    life: 1,
-    opacity: 0.6 + Math.random() * 0.4
-  });
+function createLightningEffect() {
+  for (let i = 0; i < 40; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const dist = Math.random() * 80;
+    particles.push({
+      x: player.x + Math.cos(angle) * dist,
+      y: player.y + 50 + Math.random() * 50,
+      z: player.z + Math.sin(angle) * dist,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: -0.5 - Math.random() * 0.5,
+      vz: (Math.random() - 0.5) * 0.3,
+      color: '#ffff00',
+      life: 0.5,
+      size: 3 + Math.random() * 4,
+      rotation: 0,
+      rotSpeed: 0
+    });
+  }
 }
 
-function createExplosion(x, y, z) {
-  const explosion = {
-    x: x,
-    y: y,
-    z: z,
-    radius: 5,
-    life: 1,
-    particles: []
-  };
-  
+function createFreezeEffect() {
   for (let i = 0; i < 30; i++) {
-    explosion.particles.push({
+    const angle = Math.random() * Math.PI * 2;
+    const dist = Math.random() * 50;
+    particles.push({
+      x: player.x + Math.cos(angle) * dist,
+      y: player.y + 10,
+      z: player.z + Math.sin(angle) * dist,
+      vx: 0,
+      vy: 0.1 + Math.random() * 0.2,
+      vz: 0,
+      color: '#00bfff',
+      life: 1,
+      size: 4 + Math.random() * 5,
+      rotation: Math.random() * Math.PI * 2,
+      rotSpeed: (Math.random() - 0.5) * 0.1
+    });
+  }
+}
+
+function createTransformEffect() {
+  for (let i = 0; i < 50; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const dist = Math.random() * 20;
+    particles.push({
+      x: player.x + Math.cos(angle) * dist,
+      y: player.y + Math.random() * 30,
+      z: player.z + Math.sin(angle) * dist,
+      vx: Math.cos(angle) * 0.5,
+      vy: 0.3 + Math.random() * 0.3,
+      vz: Math.sin(angle) * 0.5,
+      color: Math.random() > 0.5 ? '#f59e0b' : '#fff',
+      life: 1,
+      size: 5 + Math.random() * 5,
+      rotation: Math.random() * Math.PI * 2,
+      rotSpeed: (Math.random() - 0.5) * 0.2
+    });
+  }
+}
+
+function createExplosion(x, y, z, color) {
+  for (let i = 0; i < 30; i++) {
+    particles.push({
       x: x,
       y: y,
       z: z,
       vx: (Math.random() - 0.5) * 1.5,
       vy: Math.random() * 0.8,
       vz: (Math.random() - 0.5) * 1.5,
-      color: Math.random() > 0.5 ? '#ff4500' : '#ff8c00',
+      color: color,
       life: 1,
-      size: 3 + Math.random() * 5
+      size: 4 + Math.random() * 6,
+      rotation: Math.random() * Math.PI * 2,
+      rotSpeed: (Math.random() - 0.5) * 0.2
     });
   }
-  
-  explosionEffects.push(explosion);
 }
 
 function collectItem(item) {
   switch(item.type) {
     case 'health':
-      player.health = Math.min(100, player.health + 30);
-      showMessage('+30 生命值');
+      player.health = Math.min(player.maxHealth, player.health + 30);
+      showMessage('+30 生命');
       break;
-    case 'ammo':
-      player.inventory[0].ammo = Math.min(player.inventory[0].maxAmmo, player.inventory[0].ammo + 8);
-      showMessage('+8 弹药');
+    case 'mana':
+      player.mana = Math.min(player.maxMana, player.mana + 40);
+      showMessage('+40 法力');
       break;
-    case 'food':
-      player.survival = Math.min(100, player.survival + 25);
-      showMessage('+25 生存指数');
+    case 'exp':
+      player.exp += 50;
+      checkLevelUp();
+      showMessage('+50 经验');
       break;
-    case 'energy':
-      player.stamina = Math.min(100, player.stamina + 40);
-      showMessage('+40 体力');
+    case 'peach':
+      player.health = Math.min(player.maxHealth, player.health + 50);
+      player.mana = Math.min(player.maxMana, player.mana + 50);
+      showMessage('蟠桃：+50 生命/法力');
       break;
-    case 'weapon':
-      player.inventory[0].maxAmmo += 8;
-      showMessage('+8 最大弹药');
+    case 'wine':
+      player.mana = Math.min(player.maxMana, player.mana + 80);
+      showMessage('仙酒：+80 法力');
       break;
-    case 'armor':
-      player.health = Math.min(100, player.health + 15);
-      player.survival = Math.min(100, player.survival + 15);
-      showMessage('+15 生命/生存');
-      break;
-    case 'special':
-      player.health = Math.min(100, player.health + 50);
-      player.stamina = Math.min(100, player.stamina + 50);
-      player.survival = Math.min(100, player.survival + 50);
-      showMessage('+50 全属性');
+    case 'treasure':
+      player.exp += 100;
+      checkLevelUp();
+      showMessage('宝箱：+100 经验');
       break;
   }
   score += 50;
-  createParticles(item.x, item.y + 5, item.z, '#22c55e', 15);
+  createParticles(item.x, item.y + 5, item.z, '#f59e0b', 15);
+}
+
+function checkLevelUp() {
+  if (player.exp >= player.maxExp) {
+    player.exp -= player.maxExp;
+    player.maxExp = Math.floor(player.maxExp * 1.5);
+    level++;
+    player.maxHealth += 20;
+    player.maxMana += 15;
+    player.health = player.maxHealth;
+    player.mana = player.maxMana;
+    showMessage(`升级！等级 ${level}`);
+    createTransformEffect();
+  }
 }
 
 function createParticles(x, y, z, color, count) {
@@ -930,9 +1074,9 @@ function createParticles(x, y, z, color, count) {
       vz: (Math.random() - 0.5) * 0.6,
       color: color,
       life: 1,
-      size: 2 + Math.random() * 4,
+      size: 3 + Math.random() * 4,
       rotation: Math.random() * Math.PI * 2,
-      rotSpeed: (Math.random() - 0.5) * 0.1
+      rotSpeed: (Math.random() - 0.5) * 0.15
     });
   }
 }
@@ -945,143 +1089,94 @@ function showMessage(text) {
 }
 
 function render() {
-  // 清除画布
-  ctx.fillStyle = '#1a1a2e';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  const W = window.innerWidth;
+  const H = window.innerHeight;
   
-  // 绘制天空（更细腻）
-  const skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height * 0.6);
-  skyGradient.addColorStop(0, '#0a0a1a');
-  skyGradient.addColorStop(0.2, '#0f0f23');
-  skyGradient.addColorStop(0.4, '#1a1a2e');
-  skyGradient.addColorStop(0.6, '#2d1b4e');
-  skyGradient.addColorStop(0.8, '#4a1942');
+  // 天空
+  const skyGradient = ctx.createLinearGradient(0, 0, 0, H * 0.6);
+  skyGradient.addColorStop(0, '#1a0a2e');
+  skyGradient.addColorStop(0.3, '#2d1b4e');
+  skyGradient.addColorStop(0.6, '#4a1942');
   skyGradient.addColorStop(1, '#6b2150');
   ctx.fillStyle = skyGradient;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillRect(0, 0, W, H);
   
-  // 绘制星云效果
-  for (let i = 0; i < 5; i++) {
-    const x = canvas.width * (0.1 + i * 0.2);
-    const y = canvas.height * 0.15;
-    const nebulaGradient = ctx.createRadialGradient(x, y, 0, x, y, 100);
-    nebulaGradient.addColorStop(0, `rgba(${100 + i * 30}, ${50 + i * 20}, ${150 + i * 20}, 0.1)`);
-    nebulaGradient.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = nebulaGradient;
-    ctx.fillRect(x - 100, y - 100, 200, 200);
+  // 星空
+  ctx.fillStyle = '#fff';
+  for (let i = 0; i < 200; i++) {
+    const sx = (Math.sin(i * 132.1) * 0.5 + 0.5) * W;
+    const sy = (Math.cos(i * 73.7) * 0.5 + 0.5) * H * 0.4;
+    const size = Math.sin(Date.now() / 1000 + i) * 0.5 + 1;
+    ctx.globalAlpha = 0.4 + Math.sin(Date.now() / 2000 + i) * 0.3;
+    ctx.beginPath();
+    ctx.arc(sx, sy, size, 0, Math.PI * 2);
+    ctx.fill();
   }
+  ctx.globalAlpha = 1;
   
-  // 绘制月亮（更细腻）
-  const moonX = canvas.width * 0.8;
-  const moonY = canvas.height * 0.12;
-  const moonRadius = 50;
-  
-  // 月亮光晕
-  const moonGlow = ctx.createRadialGradient(moonX, moonY, moonRadius * 0.5, moonX, moonY, moonRadius * 3);
-  moonGlow.addColorStop(0, 'rgba(255,255,200,0.2)');
-  moonGlow.addColorStop(0.5, 'rgba(255,255,200,0.1)');
-  moonGlow.addColorStop(1, 'rgba(255,255,200,0)');
-  ctx.fillStyle = moonGlow;
-  ctx.beginPath();
-  ctx.arc(moonX, moonY, moonRadius * 3, 0, Math.PI * 2);
-  ctx.fill();
-  
-  // 月亮本体
+  // 月亮
+  const moonX = W * 0.8;
+  const moonY = H * 0.1;
   ctx.fillStyle = '#f0f0e0';
   ctx.shadowColor = '#f0f0e0';
   ctx.shadowBlur = 40;
   ctx.beginPath();
-  ctx.arc(moonX, moonY, moonRadius, 0, Math.PI * 2);
+  ctx.arc(moonX, moonY, 45, 0, Math.PI * 2);
   ctx.fill();
   ctx.shadowBlur = 0;
   
-  // 月球陨石坑
-  ctx.fillStyle = 'rgba(200,200,180,0.3)';
-  ctx.beginPath();
-  ctx.arc(moonX - 15, moonY - 10, 8, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.beginPath();
-  ctx.arc(moonX + 20, moonY + 15, 6, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.beginPath();
-  ctx.arc(moonX + 5, moonY + 25, 4, 0, Math.PI * 2);
-  ctx.fill();
-  
-  // 绘制星星（更细腻）
-  ctx.fillStyle = '#ffffff';
-  for (let i = 0; i < 300; i++) {
-    const sx = (Math.sin(i * 132.1) * 0.5 + 0.5) * canvas.width;
-    const sy = (Math.cos(i * 73.7) * 0.5 + 0.5) * canvas.height * 0.4;
-    const size = Math.sin(Date.now() / 1000 + i) * 0.8 + 1.2;
-    const brightness = 0.3 + Math.sin(Date.now() / 2000 + i) * 0.3;
-    
-    ctx.globalAlpha = brightness;
-    
-    // 星星发光效果
-    if (size > 1.5) {
-      ctx.shadowColor = '#ffffff';
-      ctx.shadowBlur = 3;
-    }
-    
-    ctx.beginPath();
-    ctx.arc(sx, sy, size, 0, Math.PI * 2);
-    ctx.fill();
-    
-    ctx.shadowBlur = 0;
-  }
-  ctx.globalAlpha = 1;
-  
-  // 绘制地面（更细腻）
-  const groundGradient = ctx.createLinearGradient(0, canvas.height * 0.6, 0, canvas.height);
+  // 地面
+  const groundGradient = ctx.createLinearGradient(0, H * 0.6, 0, H);
   groundGradient.addColorStop(0, '#2a2a1a');
-  groundGradient.addColorStop(0.2, '#1a1a0a');
-  groundGradient.addColorStop(0.5, '#0d1117');
+  groundGradient.addColorStop(0.5, '#1a1a0a');
   groundGradient.addColorStop(1, '#0a0a0a');
   ctx.fillStyle = groundGradient;
-  ctx.fillRect(0, canvas.height * 0.6, canvas.width, canvas.height * 0.4);
+  ctx.fillRect(0, H * 0.6, W, H * 0.4);
   
-  // 绘制地面纹理（更细腻）
-  for (let i = 0; i < 50; i++) {
-    const y = canvas.height * 0.6 + i * 8;
-    ctx.strokeStyle = `rgba(255,255,255,${0.02 + Math.sin(i) * 0.01})`;
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(canvas.width, y);
-    ctx.stroke();
-  }
-  
-  // 绘制地面噪点
-  for (let i = 0; i < 100; i++) {
-    const x = Math.random() * canvas.width;
-    const y = canvas.height * 0.6 + Math.random() * canvas.height * 0.4;
-    ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.05})`;
-    ctx.fillRect(x, y, 1, 1);
-  }
-  
-  // 绘制血迹
-  bloodStains.forEach(b => {
-    const relX = b.x - player.x;
-    const relZ = b.z - player.z;
+  // 远山
+  mountains.forEach(m => {
+    const relX = m.x - player.x;
+    const relZ = m.z - player.z;
     const rotX = relX * Math.cos(player.yaw) - relZ * Math.sin(player.yaw);
     const rotZ = relX * Math.sin(player.yaw) + relZ * Math.cos(player.yaw);
     
-    if (rotZ > 0.1) {
+    if (rotZ > 0) {
       const scale = 200 / rotZ;
-      const screenX = canvas.width / 2 + rotX * scale;
-      const screenY = canvas.height * 0.6;
+      const screenX = W / 2 + rotX * scale;
+      const screenY = H * 0.6;
       
-      ctx.globalAlpha = b.life * b.opacity;
-      
-      // 血迹渐变
-      const bloodGradient = ctx.createRadialGradient(screenX, screenY, 0, screenX, screenY, b.size * scale);
-      bloodGradient.addColorStop(0, '#8b0000');
-      bloodGradient.addColorStop(0.5, '#6b0000');
-      bloodGradient.addColorStop(1, 'rgba(107,0,0,0)');
-      ctx.fillStyle = bloodGradient;
-      
+      ctx.fillStyle = m.color;
       ctx.beginPath();
-      ctx.ellipse(screenX, screenY, b.size * scale, b.size * scale * 0.3, 0, 0, Math.PI * 2);
+      ctx.moveTo(screenX - m.w * scale / 2, screenY);
+      ctx.lineTo(screenX, screenY - m.h * scale);
+      ctx.lineTo(screenX + m.w * scale / 2, screenY);
+      ctx.closePath();
+      ctx.fill();
+    }
+  });
+  
+  // 云朵
+  clouds.forEach(c => {
+    const relX = c.x - player.x;
+    const relZ = c.z - player.z;
+    const rotX = relX * Math.cos(player.yaw) - relZ * Math.sin(player.yaw);
+    const rotZ = relX * Math.sin(player.yaw) + relZ * Math.cos(player.yaw);
+    
+    if (rotZ > 0 && rotZ < 300) {
+      const scale = 200 / rotZ;
+      const screenX = W / 2 + rotX * scale;
+      const screenY = H * 0.6 - c.y * scale;
+      
+      ctx.globalAlpha = c.opacity;
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.arc(screenX, screenY, c.size * scale, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(screenX - c.size * scale * 0.5, screenY + c.size * scale * 0.2, c.size * scale * 0.7, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(screenX + c.size * scale * 0.4, screenY + c.size * scale * 0.15, c.size * scale * 0.6, 0, Math.PI * 2);
       ctx.fill();
       ctx.globalAlpha = 1;
     }
@@ -1097,10 +1192,10 @@ function render() {
     const rotX = relX * Math.cos(player.yaw) - relZ * Math.sin(player.yaw);
     const rotZ = relX * Math.sin(player.yaw) + relZ * Math.cos(player.yaw);
     
-    if (rotZ > 0.1 && rotZ < 250) {
+    if (rotZ > 0.1 && rotZ < 300) {
       const scale = 200 / rotZ;
-      const screenX = canvas.width / 2 + rotX * scale;
-      const screenY = canvas.height * 0.6 - b.h * scale / 2;
+      const screenX = W / 2 + rotX * scale;
+      const screenY = H * 0.6 - b.h * scale / 2;
       
       objects3D.push({
         type: 'building',
@@ -1111,12 +1206,13 @@ function render() {
         d: rotZ,
         color: b.color,
         buildingType: b.type,
-        hasSmoke: b.hasSmoke,
-        hasChimney: b.hasChimney,
-        windows: b.windows,
-        damage: b.damage,
-        debris: b.debris,
-        hasRoof: b.hasRoof
+        hasRoof: b.hasRoof,
+        roofColor: b.roofColor,
+        pillars: b.pillars,
+        hasTree: b.hasTree,
+        treeCount: b.treeCount,
+        hasFire: b.hasFire,
+        fireIntensity: b.fireIntensity
       });
     }
   });
@@ -1130,8 +1226,8 @@ function render() {
     
     if (rotZ > 0.1 && rotZ < 200) {
       const scale = 200 / rotZ;
-      const screenX = canvas.width / 2 + rotX * scale;
-      const screenY = canvas.height * 0.6;
+      const screenX = W / 2 + rotX * scale;
+      const screenY = H * 0.6;
       
       objects3D.push({
         type: 'tree',
@@ -1142,39 +1238,41 @@ function render() {
         d: rotZ,
         treeType: t.type,
         color: t.color,
-        leaves: t.leaves,
-        branches: t.branches
+        hasFruit: t.hasFruit,
+        glow: t.glow
       });
     }
   });
   
-  // 敌人
-  enemies.forEach(e => {
+  // 妖怪
+  demons.forEach(e => {
     const relX = e.x - player.x;
     const relZ = e.z - player.z;
     const rotX = relX * Math.cos(player.yaw) - relZ * Math.sin(player.yaw);
     const rotZ = relX * Math.sin(player.yaw) + relZ * Math.cos(player.yaw);
     
-    if (rotZ > 0.1 && rotZ < 200) {
+    if (rotZ > 0.1 && rotZ < 250) {
       const scale = 200 / rotZ;
-      const screenX = canvas.width / 2 + rotX * scale;
-      const screenY = canvas.height * 0.6 - 10 * scale;
+      const screenX = W / 2 + rotX * scale;
+      const screenY = H * 0.6 - 10 * scale;
       
       objects3D.push({
-        type: 'enemy',
+        type: 'demon',
         x: screenX,
         y: screenY,
         size: e.size * scale,
         d: rotZ,
         health: e.health,
         maxHealth: e.maxHealth,
-        enemyType: e.type,
+        demonType: e.type,
+        name: e.name,
         color: e.color,
         animation: e.animation,
-        limbAnimation: e.limbAnimation,
         hasShield: e.hasShield,
-        hasWeapon: e.hasWeapon,
-        hasTentacles: e.hasTentacles
+        hasMagic: e.hasMagic,
+        shieldGlow: e.shieldGlow,
+        aura: e.aura,
+        frozen: e.frozen
       });
     }
   });
@@ -1187,10 +1285,10 @@ function render() {
     const rotX = relX * Math.cos(player.yaw) - relZ * Math.sin(player.yaw);
     const rotZ = relX * Math.sin(player.yaw) + relZ * Math.cos(player.yaw);
     
-    if (rotZ > 0.1 && rotZ < 150) {
+    if (rotZ > 0.1 && rotZ < 200) {
       const scale = 200 / rotZ;
-      const screenX = canvas.width / 2 + rotX * scale;
-      const screenY = canvas.height * 0.6 - 3 * scale + Math.sin(item.floatAnimation) * 5;
+      const screenX = W / 2 + rotX * scale;
+      const screenY = H * 0.6 - 3 * scale + Math.sin(item.float) * 6;
       
       objects3D.push({
         type: 'item',
@@ -1204,79 +1302,6 @@ function render() {
     }
   });
   
-  // 烟雾效果
-  smokeEffects.forEach(s => {
-    const relX = s.x - player.x;
-    const relZ = s.z - player.z;
-    const rotX = relX * Math.cos(player.yaw) - relZ * Math.sin(player.yaw);
-    const rotZ = relX * Math.sin(player.yaw) + relZ * Math.cos(player.yaw);
-    
-    if (rotZ > 0.1 && rotZ < 150) {
-      const scale = 200 / rotZ;
-      const screenX = canvas.width / 2 + rotX * scale;
-      const screenY = canvas.height * 0.6 - s.y * scale;
-      
-      ctx.globalAlpha = s.life * s.opacity;
-      const smokeGradient = ctx.createRadialGradient(screenX, screenY, 0, screenX, screenY, s.size * scale);
-      smokeGradient.addColorStop(0, 'rgba(100,100,100,0.3)');
-      smokeGradient.addColorStop(1, 'rgba(100,100,100,0)');
-      ctx.fillStyle = smokeGradient;
-      ctx.beginPath();
-      ctx.arc(screenX, screenY, s.size * scale, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.globalAlpha = 1;
-    }
-  });
-  
-  // 爆炸效果
-  explosionEffects.forEach(e => {
-    const relX = e.x - player.x;
-    const relZ = e.z - player.z;
-    const rotX = relX * Math.cos(player.yaw) - relZ * Math.sin(player.yaw);
-    const rotZ = relX * Math.sin(player.yaw) + relZ * Math.cos(player.yaw);
-    
-    if (rotZ > 0.1) {
-      const scale = 200 / rotZ;
-      const screenX = canvas.width / 2 + rotX * scale;
-      const screenY = canvas.height * 0.6 - e.y * scale;
-      
-      // 爆炸光环
-      ctx.globalAlpha = e.life;
-      ctx.strokeStyle = '#ff4500';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.arc(screenX, screenY, e.radius * scale, 0, Math.PI * 2);
-      ctx.stroke();
-      
-      // 爆炸内环
-      ctx.strokeStyle = '#ffff00';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(screenX, screenY, e.radius * scale * 0.7, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.globalAlpha = 1;
-      
-      // 爆炸粒子
-      e.particles.forEach(p => {
-        const pRotX = (p.x - player.x) * Math.cos(player.yaw) - (p.z - player.z) * Math.sin(player.yaw);
-        const pRotZ = (p.x - player.x) * Math.sin(player.yaw) + (p.z - player.z) * Math.cos(player.yaw);
-        
-        if (pRotZ > 0.1) {
-          const pScale = 200 / pRotZ;
-          const pScreenX = canvas.width / 2 + pRotX * pScale;
-          const pScreenY = canvas.height * 0.6 - p.y * pScale;
-          
-          ctx.globalAlpha = p.life;
-          ctx.fillStyle = p.color;
-          ctx.beginPath();
-          ctx.arc(pScreenX, pScreenY, p.size * pScale, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.globalAlpha = 1;
-        }
-      });
-    }
-  });
-  
   // 粒子
   particles.forEach(p => {
     const relX = p.x - player.x;
@@ -1286,12 +1311,11 @@ function render() {
     
     if (rotZ > 0.1) {
       const scale = 200 / rotZ;
-      const screenX = canvas.width / 2 + rotX * scale;
-      const screenY = canvas.height * 0.6 - p.y * scale;
+      const screenX = W / 2 + rotX * scale;
+      const screenY = H * 0.6 - p.y * scale;
       
       ctx.globalAlpha = p.life;
       ctx.fillStyle = p.color;
-      
       ctx.save();
       ctx.translate(screenX, screenY);
       ctx.rotate(p.rotation);
@@ -1299,334 +1323,205 @@ function render() {
       ctx.arc(0, 0, p.size * scale, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
-      
       ctx.globalAlpha = 1;
     }
   });
   
-  // 按距离排序并绘制
+  // 按距离排序
   objects3D.sort((a, b) => b.d - a.d);
   
   objects3D.forEach(obj => {
     if (obj.type === 'building') {
-      // 绘制建筑阴影
-      ctx.fillStyle = 'rgba(0,0,0,0.3)';
-      ctx.fillRect(obj.x - obj.w/2 + 5, obj.y + obj.h, obj.w, 10);
+      // 建筑阴影
+      ctx.fillStyle = 'rgba(0,0,0,0.2)';
+      ctx.fillRect(obj.x - obj.w/2 + 5, obj.y + obj.h, obj.w, 8);
       
-      // 绘制建筑主体
-      const buildingGradient = ctx.createLinearGradient(obj.x - obj.w/2, obj.y, obj.x + obj.w/2, obj.y);
-      buildingGradient.addColorStop(0, obj.color);
-      buildingGradient.addColorStop(0.5, lightenColor(obj.color, 10));
-      buildingGradient.addColorStop(1, obj.color);
-      ctx.fillStyle = buildingGradient;
+      // 建筑主体
+      const gradient = ctx.createLinearGradient(obj.x - obj.w/2, obj.y, obj.x + obj.w/2, obj.y);
+      gradient.addColorStop(0, obj.color);
+      gradient.addColorStop(0.5, lightenColor(obj.color, 10));
+      gradient.addColorStop(1, obj.color);
+      ctx.fillStyle = gradient;
       ctx.fillRect(obj.x - obj.w/2, obj.y, obj.w, obj.h);
       
-      // 绘制建筑损坏效果
-      if (obj.damage > 0) {
-        ctx.fillStyle = 'rgba(0,0,0,0.4)';
-        ctx.fillRect(obj.x - obj.w/2, obj.y, obj.w * obj.damage, obj.h * 0.3);
-        
-        // 碎片效果
-        for (let i = 0; i < obj.debris; i++) {
-          const debrisX = obj.x - obj.w/2 + Math.random() * obj.w;
-          const debrisY = obj.y + obj.h * 0.7 + Math.random() * obj.h * 0.3;
-          ctx.fillStyle = 'rgba(100,100,100,0.5)';
-          ctx.fillRect(debrisX, debrisY, 3, 3);
-        }
-      }
-      
-      // 绘制窗户
-      if (obj.windows) {
-        const windowSize = Math.min(obj.w, obj.h) * 0.12;
-        for (let i = 0; i < obj.windows; i++) {
-          const wx = obj.x - obj.w/2 + (i + 1) * obj.w / (obj.windows + 1) - windowSize/2;
-          const wy = obj.y + obj.h * 0.3;
-          
-          // 窗户发光
-          const windowGlow = ctx.createRadialGradient(wx + windowSize/2, wy + windowSize/2, 0, wx + windowSize/2, wy + windowSize/2, windowSize);
-          windowGlow.addColorStop(0, 'rgba(255,255,200,0.4)');
-          windowGlow.addColorStop(1, 'rgba(255,255,200,0)');
-          ctx.fillStyle = windowGlow;
-          ctx.fillRect(wx - windowSize/2, wy - windowSize/2, windowSize * 2, windowSize * 2);
-          
-          ctx.fillStyle = 'rgba(255,255,200,0.6)';
-          ctx.fillRect(wx, wy, windowSize, windowSize);
-        }
-      }
-      
-      // 绘制屋顶
+      // 屋顶
       if (obj.hasRoof) {
-        ctx.fillStyle = darkenColor(obj.color, 20);
+        ctx.fillStyle = obj.roofColor || '#dc2626';
         ctx.beginPath();
-        ctx.moveTo(obj.x - obj.w/2 - 5, obj.y);
-        ctx.lineTo(obj.x, obj.y - obj.h * 0.2);
-        ctx.lineTo(obj.x + obj.w/2 + 5, obj.y);
+        ctx.moveTo(obj.x - obj.w/2 - 8, obj.y);
+        ctx.lineTo(obj.x, obj.y - obj.h * 0.3);
+        ctx.lineTo(obj.x + obj.w/2 + 8, obj.y);
         ctx.closePath();
         ctx.fill();
       }
       
-      // 绘制烟囱
-      if (obj.hasChimney) {
-        ctx.fillStyle = '#4a4a4a';
-        ctx.fillRect(obj.x + obj.w/4, obj.y - obj.h * 0.3, obj.w * 0.1, obj.h * 0.3);
+      // 柱子
+      if (obj.pillars) {
+        ctx.fillStyle = '#8b4513';
+        for (let i = 0; i < obj.pillars; i++) {
+          const px = obj.x - obj.w/2 + (i + 1) * obj.w / (obj.pillars + 1);
+          ctx.fillRect(px - 3, obj.y, 6, obj.h);
+        }
       }
       
-      // 绘制建筑边框
-      ctx.strokeStyle = 'rgba(0,0,0,0.4)';
+      // 丹炉火焰
+      if (obj.hasFire) {
+        ctx.fillStyle = `rgba(255,100,0,${obj.fireIntensity})`;
+        ctx.beginPath();
+        ctx.arc(obj.x, obj.y - 5, obj.w * 0.3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      
+      ctx.strokeStyle = 'rgba(0,0,0,0.3)';
       ctx.lineWidth = 2;
       ctx.strokeRect(obj.x - obj.w/2, obj.y, obj.w, obj.h);
       
     } else if (obj.type === 'tree') {
-      if (obj.treeType === 'normal') {
-        // 树干
-        ctx.fillStyle = '#3d2b1f';
-        ctx.fillRect(obj.x - 3, obj.y - obj.h * 0.4, 6, obj.h * 0.4);
-        
-        // 树干纹理
-        ctx.strokeStyle = 'rgba(0,0,0,0.2)';
-        ctx.lineWidth = 1;
-        for (let i = 0; i < 3; i++) {
-          const ty = obj.y - obj.h * 0.1 - i * obj.h * 0.1;
-          ctx.beginPath();
-          ctx.moveTo(obj.x - 2, ty);
-          ctx.lineTo(obj.x + 2, ty);
-          ctx.stroke();
-        }
-        
-        // 树叶（多层）
-        for (let i = 0; i < obj.leaves; i++) {
-          const leafY = obj.y - obj.h * 0.5 - i * obj.h * 0.15;
-          const leafR = obj.r * (1 - i * 0.2);
-          
-          ctx.fillStyle = obj.color;
-          ctx.beginPath();
-          ctx.arc(obj.x, leafY, leafR, 0, Math.PI * 2);
-          ctx.fill();
-          
-          // 树叶高光
-          ctx.fillStyle = 'rgba(255,255,255,0.1)';
-          ctx.beginPath();
-          ctx.arc(obj.x - leafR * 0.3, leafY - leafR * 0.3, leafR * 0.5, 0, Math.PI * 2);
-          ctx.fill();
-        }
-        
-      } else if (obj.treeType === 'dead') {
-        // 枯树
-        ctx.strokeStyle = obj.color;
-        ctx.lineWidth = 4;
+      // 树干
+      ctx.fillStyle = '#5a3d2b';
+      ctx.fillRect(obj.x - 4, obj.y - obj.h * 0.4, 8, obj.h * 0.4);
+      
+      // 树叶
+      const glowIntensity = Math.sin(obj.glow) * 0.2 + 0.8;
+      ctx.fillStyle = obj.color;
+      ctx.beginPath();
+      ctx.arc(obj.x, obj.y - obj.h * 0.6, obj.r * glowIntensity, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // 蟠桃
+      if (obj.hasFruit && obj.treeType === 'peach') {
+        ctx.fillStyle = '#ff69b4';
+        ctx.shadowColor = '#ff69b4';
+        ctx.shadowBlur = 10;
         ctx.beginPath();
-        ctx.moveTo(obj.x, obj.y);
-        ctx.lineTo(obj.x, obj.y - obj.h);
-        ctx.stroke();
-        
-        // 枯树枝
-        ctx.lineWidth = 2;
-        for (let i = 0; i < obj.branches; i++) {
-          const branchY = obj.y - obj.h * (0.3 + i * 0.2);
-          const branchDir = i % 2 === 0 ? -1 : 1;
-          ctx.beginPath();
-          ctx.moveTo(obj.x, branchY);
-          ctx.lineTo(obj.x + obj.r * branchDir, branchY - obj.h * 0.1);
-          ctx.stroke();
-        }
-        
-      } else if (obj.treeType === 'bush') {
-        // 灌木
-        ctx.fillStyle = obj.color;
-        ctx.beginPath();
-        ctx.arc(obj.x, obj.y - obj.h/2, obj.r, 0, Math.PI * 2);
+        ctx.arc(obj.x + obj.r * 0.5, obj.y - obj.h * 0.5, 4, 0, Math.PI * 2);
         ctx.fill();
-        
-        // 灌木阴影
-        ctx.fillStyle = 'rgba(0,0,0,0.2)';
-        ctx.beginPath();
-        ctx.arc(obj.x + obj.r * 0.2, obj.y - obj.h/2 + obj.r * 0.2, obj.r * 0.8, 0, Math.PI * 2);
-        ctx.fill();
-        
-      } else if (obj.treeType === 'cactus') {
-        // 仙人掌
-        ctx.fillStyle = obj.color;
-        ctx.fillRect(obj.x - obj.r/2, obj.y - obj.h, obj.r, obj.h);
-        
-        // 仙人掌分支
-        ctx.fillRect(obj.x - obj.r * 1.5, obj.y - obj.h * 0.7, obj.r, obj.h * 0.3);
-        ctx.fillRect(obj.x + obj.r * 0.5, obj.y - obj.h * 0.5, obj.r, obj.h * 0.2);
-        
-        // 仙人掌刺
-        ctx.strokeStyle = '#2d5a2d';
-        ctx.lineWidth = 1;
-        for (let i = 0; i < 5; i++) {
-          const spikeY = obj.y - obj.h * 0.2 - i * obj.h * 0.15;
-          ctx.beginPath();
-          ctx.moveTo(obj.x - obj.r/2, spikeY);
-          ctx.lineTo(obj.x - obj.r, spikeY - 3);
-          ctx.stroke();
-          ctx.beginPath();
-          ctx.moveTo(obj.x + obj.r/2, spikeY);
-          ctx.lineTo(obj.x + obj.r, spikeY - 3);
-          ctx.stroke();
-        }
+        ctx.shadowBlur = 0;
       }
       
-    } else if (obj.type === 'enemy') {
+    } else if (obj.type === 'demon') {
       const bodyWidth = obj.size * 0.8;
       const bodyHeight = obj.size * 1.2;
       
-      // 敌人阴影
-      ctx.fillStyle = 'rgba(0,0,0,0.3)';
-      ctx.beginPath();
-      ctx.ellipse(obj.x, obj.y, obj.size * 0.6, obj.size * 0.2, 0, 0, Math.PI * 2);
-      ctx.fill();
+      // 妖王光环
+      if (obj.demonType === 'demon_king') {
+        ctx.globalAlpha = 0.3;
+        const auraGradient = ctx.createRadialGradient(obj.x, obj.y - bodyHeight/2, 0, obj.x, obj.y - bodyHeight/2, obj.size * 1.5);
+        auraGradient.addColorStop(0, 'rgba(139,0,0,0.4)');
+        auraGradient.addColorStop(1, 'rgba(139,0,0,0)');
+        ctx.fillStyle = auraGradient;
+        ctx.beginPath();
+        ctx.arc(obj.x, obj.y - bodyHeight/2, obj.size * 1.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      }
       
-      // 身体动画
-      const wobble = Math.sin(obj.animation) * 3;
-      const limbWobble = Math.sin(obj.limbAnimation) * 5;
-      
-      // 绘制触手（变异体）
-      if (obj.hasTentacles) {
-        ctx.strokeStyle = obj.color;
+      // 定身效果
+      if (obj.frozen) {
+        ctx.strokeStyle = '#00bfff';
         ctx.lineWidth = 3;
-        for (let i = 0; i < 4; i++) {
-          const tentAngle = (i / 4) * Math.PI * 2 + obj.animation;
-          const tentX = obj.x + Math.cos(tentAngle) * obj.size * 0.8;
-          const tentY = obj.y - bodyHeight/2 + Math.sin(tentAngle) * obj.size * 0.3;
-          ctx.beginPath();
-          ctx.moveTo(obj.x, obj.y - bodyHeight/2);
-          ctx.quadraticCurveTo(tentX, tentY, tentX + Math.cos(tentAngle) * 10, tentY + 10);
-          ctx.stroke();
-        }
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath();
+        ctx.arc(obj.x, obj.y - bodyHeight/2, obj.size * 0.9, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
       }
       
       // 身体
-      const bodyGradient = ctx.createLinearGradient(obj.x - bodyWidth/2, obj.y - bodyHeight, obj.x + bodyWidth/2, obj.y);
-      bodyGradient.addColorStop(0, lightenColor(obj.color, 20));
-      bodyGradient.addColorStop(1, obj.color);
-      ctx.fillStyle = bodyGradient;
+      const wobble = Math.sin(obj.animation) * 3;
+      ctx.fillStyle = obj.color;
       ctx.fillRect(obj.x - bodyWidth/2 + wobble, obj.y - bodyHeight, bodyWidth, bodyHeight);
       
       // 头部
-      ctx.fillStyle = obj.color;
       ctx.beginPath();
       ctx.arc(obj.x + wobble, obj.y - bodyHeight - obj.size * 0.3, obj.size * 0.35, 0, Math.PI * 2);
       ctx.fill();
       
-      // 眼睛（发光效果）
+      // 眼睛
+      ctx.fillStyle = '#ff0000';
       ctx.shadowColor = '#ff0000';
       ctx.shadowBlur = 10;
-      ctx.fillStyle = '#ff0000';
       ctx.beginPath();
-      ctx.arc(obj.x - obj.size * 0.15 + wobble, obj.y - bodyHeight - obj.size * 0.35, obj.size * 0.08, 0, Math.PI * 2);
+      ctx.arc(obj.x - obj.size * 0.12 + wobble, obj.y - bodyHeight - obj.size * 0.35, obj.size * 0.08, 0, Math.PI * 2);
       ctx.fill();
       ctx.beginPath();
-      ctx.arc(obj.x + obj.size * 0.15 + wobble, obj.y - bodyHeight - obj.size * 0.35, obj.size * 0.08, 0, Math.PI * 2);
+      ctx.arc(obj.x + obj.size * 0.12 + wobble, obj.y - bodyHeight - obj.size * 0.35, obj.size * 0.08, 0, Math.PI * 2);
       ctx.fill();
       ctx.shadowBlur = 0;
       
-      // 武器
-      if (obj.hasWeapon) {
-        ctx.fillStyle = '#666';
-        ctx.fillRect(obj.x + bodyWidth/2 + wobble, obj.y - bodyHeight * 0.8, obj.size * 0.3, obj.size * 0.1);
-      }
-      
-      // 护盾效果
+      // 护盾
       if (obj.hasShield) {
-        ctx.strokeStyle = 'rgba(100,200,255,0.5)';
+        ctx.strokeStyle = `rgba(139,0,0,${Math.sin(obj.shieldGlow) * 0.3 + 0.5})`;
         ctx.lineWidth = 3;
-        ctx.setLineDash([5, 5]);
+        ctx.setLineDash([8, 4]);
         ctx.beginPath();
         ctx.arc(obj.x + wobble, obj.y - bodyHeight/2, obj.size * 0.9, 0, Math.PI * 2);
         ctx.stroke();
         ctx.setLineDash([]);
       }
       
-      // 血条背景
-      ctx.fillStyle = 'rgba(0,0,0,0.5)';
-      ctx.fillRect(obj.x - obj.size/2, obj.y - obj.size - 16, obj.size, 8);
-      
       // 血条
+      ctx.fillStyle = 'rgba(0,0,0,0.6)';
+      ctx.fillRect(obj.x - obj.size/2, obj.y - obj.size - 14, obj.size, 8);
       const healthPercent = obj.health / obj.maxHealth;
-      const healthColor = healthPercent > 0.5 ? '#22c55e' : healthPercent > 0.25 ? '#f59e0b' : '#ef4444';
-      ctx.fillStyle = healthColor;
-      const healthWidth = healthPercent * obj.size;
-      ctx.fillRect(obj.x - obj.size/2, obj.y - obj.size - 16, healthWidth, 8);
+      ctx.fillStyle = healthPercent > 0.5 ? '#22c55e' : healthPercent > 0.25 ? '#f59e0b' : '#ef4444';
+      ctx.fillRect(obj.x - obj.size/2, obj.y - obj.size - 14, healthPercent * obj.size, 8);
       
-      // 血条边框
-      ctx.strokeStyle = 'rgba(255,255,255,0.3)';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(obj.x - obj.size/2, obj.y - obj.size - 16, obj.size, 8);
-      
-      // Boss标识
-      if (obj.enemyType === 'boss') {
-        ctx.fillStyle = '#ff4500';
-        ctx.font = `${obj.size * 0.4}px Arial`;
-        ctx.textAlign = 'center';
-        ctx.fillText('BOSS', obj.x + wobble, obj.y - obj.size - 25);
-      }
+      // 名字
+      ctx.fillStyle = '#fff';
+      ctx.font = `${Math.max(10, obj.size * 0.3)}px STKaiti, KaiTi, serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText(obj.name, obj.x + wobble, obj.y - obj.size - 18);
       
     } else if (obj.type === 'item') {
-      // 物品发光效果
-      const glowIntensity = Math.sin(obj.glow) * 0.3 + 0.7;
-      ctx.shadowColor = getItemColor(obj.itemType);
-      ctx.shadowBlur = 15 * glowIntensity;
+      const pulse = Math.sin(obj.glow) * 0.2 + 1;
       
-      // 物品光圈
-      const glowGradient = ctx.createRadialGradient(obj.x, obj.y, 0, obj.x, obj.y, obj.size * 2);
-      glowGradient.addColorStop(0, `${getItemColor(obj.itemType)}40`);
+      // 光圈
+      ctx.globalAlpha = 0.4;
+      const glowGradient = ctx.createRadialGradient(obj.x, obj.y, 0, obj.x, obj.y, obj.size * 2 * pulse);
+      glowGradient.addColorStop(0, `${getItemColor(obj.itemType)}60`);
       glowGradient.addColorStop(1, `${getItemColor(obj.itemType)}00`);
       ctx.fillStyle = glowGradient;
       ctx.beginPath();
-      ctx.arc(obj.x, obj.y, obj.size * 2, 0, Math.PI * 2);
+      ctx.arc(obj.x, obj.y, obj.size * 2 * pulse, 0, Math.PI * 2);
       ctx.fill();
+      ctx.globalAlpha = 1;
       
-      // 物品本体
+      // 物品
       ctx.fillStyle = getItemColor(obj.itemType);
+      ctx.shadowColor = getItemColor(obj.itemType);
+      ctx.shadowBlur = 15;
       ctx.beginPath();
-      ctx.arc(obj.x, obj.y, obj.size * glowIntensity, 0, Math.PI * 2);
+      ctx.arc(obj.x, obj.y, obj.size * pulse, 0, Math.PI * 2);
       ctx.fill();
-      
       ctx.shadowBlur = 0;
       
-      // 物品图标
+      // 图标
       ctx.fillStyle = '#fff';
-      ctx.font = `${obj.size * 1.8}px Arial`;
+      ctx.font = `${obj.size * 1.5}px Arial`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(getItemIcon(obj.itemType), obj.x, obj.y);
     }
   });
   
-  // 绘制伤害效果
-  if (player.health < 30) {
-    const damageIntensity = 0.2 + Math.sin(Date.now() / 200) * 0.1;
-    ctx.fillStyle = `rgba(255,0,0,${damageIntensity})`;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    // 伤害边缘效果
-    const edgeGradient = ctx.createRadialGradient(canvas.width/2, canvas.height/2, canvas.width * 0.3, canvas.width/2, canvas.height/2, canvas.width * 0.7);
-    edgeGradient.addColorStop(0, 'rgba(255,0,0,0)');
-    edgeGradient.addColorStop(1, `rgba(255,0,0,${damageIntensity * 0.5})`);
-    ctx.fillStyle = edgeGradient;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  // 变身效果
+  if (player.transform) {
+    ctx.globalAlpha = 0.1;
+    ctx.fillStyle = '#f59e0b';
+    ctx.fillRect(0, 0, W, H);
+    ctx.globalAlpha = 1;
   }
   
-  // 绘制冲刺效果
-  if (player.isSprinting) {
-    ctx.fillStyle = 'rgba(255,255,255,0.03)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    // 冲刺模糊效果
-    ctx.fillStyle = 'rgba(255,255,255,0.02)';
-    for (let i = 0; i < 5; i++) {
-      const blurX = Math.random() * canvas.width;
-      const blurY = Math.random() * canvas.height;
-      ctx.fillRect(blurX, blurY, 100, 2);
-    }
-  }
+  // 暗角
+  const vignette = ctx.createRadialGradient(W/2, H/2, W * 0.4, W/2, H/2, W * 0.8);
+  vignette.addColorStop(0, 'rgba(0,0,0,0)');
+  vignette.addColorStop(0.7, 'rgba(0,0,0,0.1)');
+  vignette.addColorStop(1, 'rgba(0,0,0,0.3)');
+  ctx.fillStyle = vignette;
+  ctx.fillRect(0, 0, W, H);
   
-  // 绘制小地图
   renderMinimap();
-  
-  // 更新UI
   updateUI();
 }
 
@@ -1639,24 +1534,14 @@ function lightenColor(color, percent) {
   return `#${(1 << 24 | R << 16 | G << 8 | B).toString(16).slice(1)}`;
 }
 
-function darkenColor(color, percent) {
-  const num = parseInt(color.replace('#', ''), 16);
-  const amt = Math.round(2.55 * percent);
-  const R = Math.max(0, (num >> 16) - amt);
-  const G = Math.max(0, ((num >> 8) & 0x00FF) - amt);
-  const B = Math.max(0, (num & 0x0000FF) - amt);
-  return `#${(1 << 24 | R << 16 | G << 8 | B).toString(16).slice(1)}`;
-}
-
 function getItemColor(type) {
   const colors = {
     health: '#ef4444',
-    ammo: '#f59e0b',
-    food: '#22c55e',
-    energy: '#3b82f6',
-    weapon: '#8b5cf6',
-    armor: '#06b6d4',
-    special: '#ec4899'
+    mana: '#3b82f6',
+    exp: '#f59e0b',
+    peach: '#ff69b4',
+    wine: '#8b5cf6',
+    treasure: '#22c55e'
   };
   return colors[type] || '#fff';
 }
@@ -1664,47 +1549,43 @@ function getItemColor(type) {
 function getItemIcon(type) {
   const icons = {
     health: '❤️',
-    ammo: '🔫',
-    food: '🍖',
-    energy: '⚡',
-    weapon: '⚔️',
-    armor: '🛡️',
-    special: '⭐'
+    mana: '💧',
+    exp: '⭐',
+    peach: '🍑',
+    wine: '🍶',
+    treasure: '🎁'
   };
   return icons[type] || '❓';
 }
 
 function renderMinimap() {
-  minimapCtx.fillStyle = 'rgba(0,0,0,0.8)';
+  minimapCtx.fillStyle = 'rgba(0,0,0,0.85)';
   minimapCtx.fillRect(0, 0, 180, 180);
   
   const scale = 180 / 200;
   const centerX = 90;
   const centerY = 90;
   
-  // 绘制建筑
   buildings.forEach(b => {
     const rx = (b.x - player.x) * scale + centerX;
     const rz = (b.z - player.z) * scale + centerY;
     if (rx > 0 && rx < 180 && rz > 0 && rz < 180) {
-      minimapCtx.fillStyle = b.type === 'ruin' ? '#5a4a3a' : '#4a5568';
+      minimapCtx.fillStyle = '#f59e0b';
       minimapCtx.fillRect(rx - 3, rz - 3, 6, 6);
     }
   });
   
-  // 绘制敌人
-  enemies.forEach(e => {
+  demons.forEach(e => {
     const rx = (e.x - player.x) * scale + centerX;
     const rz = (e.z - player.z) * scale + centerY;
     if (rx > 0 && rx < 180 && rz > 0 && rz < 180) {
-      minimapCtx.fillStyle = e.type === 'boss' ? '#ff4500' : e.type === 'elite' ? '#7c3aed' : '#ef4444';
+      minimapCtx.fillStyle = e.type === 'demon_king' ? '#ff4500' : e.type === 'great_demon' ? '#dc2626' : '#ef4444';
       minimapCtx.beginPath();
-      minimapCtx.arc(rx, rz, e.type === 'boss' ? 5 : 3, 0, Math.PI * 2);
+      minimapCtx.arc(rx, rz, e.type === 'demon_king' ? 5 : 3, 0, Math.PI * 2);
       minimapCtx.fill();
     }
   });
   
-  // 绘制物品
   items.forEach(item => {
     if (item.collected) return;
     const rx = (item.x - player.x) * scale + centerX;
@@ -1717,52 +1598,49 @@ function renderMinimap() {
     }
   });
   
-  // 绘制玩家
-  minimapCtx.fillStyle = '#3b82f6';
+  minimapCtx.fillStyle = '#f59e0b';
   minimapCtx.beginPath();
   minimapCtx.arc(centerX, centerY, 5, 0, Math.PI * 2);
   minimapCtx.fill();
   
-  // 绘制方向
   const dirX = Math.sin(player.yaw) * 15;
   const dirZ = Math.cos(player.yaw) * 15;
-  minimapCtx.strokeStyle = '#3b82f6';
+  minimapCtx.strokeStyle = '#f59e0b';
   minimapCtx.lineWidth = 2;
   minimapCtx.beginPath();
   minimapCtx.moveTo(centerX, centerY);
   minimapCtx.lineTo(centerX + dirX, centerY + dirZ);
   minimapCtx.stroke();
-  
-  // 绘制视野范围
-  minimapCtx.strokeStyle = 'rgba(59,130,246,0.2)';
-  minimapCtx.lineWidth = 1;
-  minimapCtx.beginPath();
-  minimapCtx.arc(centerX, centerY, 50, 0, Math.PI * 2);
-  minimapCtx.stroke();
 }
 
 function updateUI() {
-  document.getElementById('healthBar').style.width = player.health + '%';
+  document.getElementById('healthBar').style.width = (player.health / player.maxHealth * 100) + '%';
   document.getElementById('healthText').textContent = Math.round(player.health);
-  document.getElementById('staminaBar').style.width = player.stamina + '%';
-  document.getElementById('staminaText').textContent = Math.round(player.stamina);
-  document.getElementById('survivalBar').style.width = player.survival + '%';
-  document.getElementById('survivalText').textContent = Math.round(player.survival);
+  document.getElementById('manaBar').style.width = (player.mana / player.maxMana * 100) + '%';
+  document.getElementById('manaText').textContent = Math.round(player.mana);
+  document.getElementById('expBar').style.width = (player.exp / player.maxExp * 100) + '%';
+  document.getElementById('expText').textContent = `${player.exp}/${player.maxExp}`;
   
-  const minutes = Math.floor(gameTime / 60);
-  const seconds = Math.floor(gameTime % 60);
-  const timerEl = document.getElementById('deathTimer');
-  timerEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-  timerEl.className = gameTime < 120 ? 'warning' : '';
-  
-  const riskEl = document.getElementById('riskFactors');
-  riskEl.innerHTML = '<div style="margin-bottom:8px;font-weight:bold;">⚠️ 风险因素</div>';
-  riskFactors.forEach(rf => {
-    riskEl.innerHTML += `<div class="risk-factor">${rf.icon} ${rf.name}</div>`;
+  document.querySelectorAll('.skill-slot').forEach((slot, i) => {
+    const skill = player.skills[i];
+    slot.className = 'skill-slot' + (i === player.selectedSkill ? ' active' : '');
+    const cdEl = slot.querySelector('.skill-cd');
+    if (skill.cooldown > 0) {
+      if (!cdEl) {
+        const cd = document.createElement('span');
+        cd.className = 'skill-cd';
+        cd.textContent = Math.ceil(skill.cooldown / 1000) + 's';
+        slot.appendChild(cd);
+      } else {
+        cdEl.textContent = Math.ceil(skill.cooldown / 1000) + 's';
+      }
+    } else if (cdEl) {
+      cdEl.remove();
+    }
   });
   
   document.querySelectorAll('.inv-slot').forEach((slot, i) => {
-    slot.className = 'inv-slot' + (i === player.selectedSlot ? ' active' : '');
+    slot.className = 'inv-slot' + (i === 0 ? ' active' : '');
   });
 }
 
@@ -1770,10 +1648,10 @@ function gameOver(reason) {
   gameRunning = false;
   document.getElementById('gameOver').style.display = 'flex';
   document.getElementById('deathStats').innerHTML = `
-    死亡原因：${reason}<br>
-    生存时间：${Math.round(score)}秒<br>
-    击杀敌人：${kills}<br>
-    最终评分：${Math.round(score * 10 + kills * 100)}
+    失败原因：${reason}<br>
+    等级：${level}<br>
+    击杀妖怪：${kills}<br>
+    最终评分：${Math.round(score * 10 + kills * 100 + level * 500)}
   `;
   document.body.style.cursor = 'default';
 }
@@ -1781,15 +1659,17 @@ function gameOver(reason) {
 function startGame() {
   document.getElementById('startScreen').style.display = 'none';
   gameRunning = true;
-  gameTime = 3600;
+  gameTime = 7200;
   score = 0;
   kills = 0;
+  level = 1;
   player.x = 0;
   player.y = 0;
   player.z = 0;
   player.health = 100;
-  player.stamina = 100;
-  player.survival = 100;
+  player.mana = 100;
+  player.exp = 0;
+  player.transform = null;
   document.body.style.cursor = 'none';
   initWorld();
   gameLoop();
@@ -1803,22 +1683,18 @@ function restartGame() {
 let lastTime = 0;
 function gameLoop(timestamp = 0) {
   if (!gameRunning) return;
-  
   const deltaTime = timestamp - lastTime;
   lastTime = timestamp;
-  
   update(deltaTime);
   render();
-  
   requestAnimationFrame(gameLoop);
 }
 
 document.addEventListener('keydown', e => {
   keys[e.key] = true;
-  
   const num = parseInt(e.key);
-  if (num >= 1 && num <= 8) {
-    player.selectedSlot = num - 1;
+  if (num >= 1 && num <= 5) {
+    player.selectedSkill = num - 1;
   }
 });
 
@@ -1842,14 +1718,16 @@ document.addEventListener('mouseup', e => {
 });
 
 canvas.addEventListener('click', () => {
-  if (gameRunning) {
-    canvas.requestPointerLock();
-  }
+  if (gameRunning) canvas.requestPointerLock();
 });
 
 window.addEventListener('resize', () => {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+  const PIXEL_RATIO = window.devicePixelRatio || 1;
+  canvas.width = window.innerWidth * PIXEL_RATIO;
+  canvas.height = window.innerHeight * PIXEL_RATIO;
+  canvas.style.width = window.innerWidth + 'px';
+  canvas.style.height = window.innerHeight + 'px';
+  ctx.scale(PIXEL_RATIO, PIXEL_RATIO);
 });
 </script>
 </body>
