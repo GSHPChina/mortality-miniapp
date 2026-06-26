@@ -384,6 +384,8 @@ let buildings = [];
 let trees = [];
 let bloodStains = [];
 let explosionEffects = [];
+let smokeEffects = [];
+let fireEffects = [];
 
 function initWorld() {
   buildings = [];
@@ -392,9 +394,11 @@ function initWorld() {
   items = [];
   bloodStains = [];
   explosionEffects = [];
+  smokeEffects = [];
+  fireEffects = [];
   
   // 创建更多样化的建筑
-  for (let i = 0; i < 40; i++) {
+  for (let i = 0; i < 50; i++) {
     const type = Math.random();
     let building;
     if (type < 0.3) {
@@ -407,7 +411,8 @@ function initWorld() {
         d: 15 + Math.random() * 25,
         color: `hsl(${20 + Math.random() * 10}, ${30 + Math.random() * 20}%, ${25 + Math.random() * 15}%)`,
         type: 'ruin',
-        damage: Math.random() * 0.5
+        damage: Math.random() * 0.5,
+        debris: Math.random() * 5
       };
     } else if (type < 0.6) {
       // 工厂
@@ -419,7 +424,8 @@ function initWorld() {
         d: 30 + Math.random() * 40,
         color: `hsl(${210 + Math.random() * 20}, ${15 + Math.random() * 10}%, ${30 + Math.random() * 15}%)`,
         type: 'factory',
-        hasSmoke: Math.random() > 0.5
+        hasSmoke: Math.random() > 0.5,
+        hasChimney: Math.random() > 0.5
       };
     } else {
       // 普通建筑
@@ -431,27 +437,29 @@ function initWorld() {
         d: 20 + Math.random() * 30,
         color: `hsl(${200 + Math.random() * 20}, ${20 + Math.random() * 10}%, ${35 + Math.random() * 20}%)`,
         type: 'building',
-        windows: Math.floor(Math.random() * 4) + 1
+        windows: Math.floor(Math.random() * 4) + 1,
+        hasRoof: Math.random() > 0.3
       };
     }
     buildings.push(building);
   }
   
   // 创建更多样化的树木
-  for (let i = 0; i < 150; i++) {
+  for (let i = 0; i < 200; i++) {
     const treeType = Math.random();
     let tree;
-    if (treeType < 0.6) {
+    if (treeType < 0.5) {
       // 普通树
       tree = {
         x: (Math.random() - 0.5) * WORLD_SIZE,
         z: (Math.random() - 0.5) * WORLD_SIZE,
-        h: 15 + Math.random() * 20,
-        r: 3 + Math.random() * 4,
+        h: 15 + Math.random() * 25,
+        r: 3 + Math.random() * 5,
         type: 'normal',
-        color: `hsl(${100 + Math.random() * 40}, ${50 + Math.random() * 30}%, ${25 + Math.random() * 20}%)`
+        color: `hsl(${100 + Math.random() * 40}, ${50 + Math.random() * 30}%, ${25 + Math.random() * 20}%)`,
+        leaves: Math.floor(Math.random() * 3) + 2
       };
-    } else if (treeType < 0.8) {
+    } else if (treeType < 0.7) {
       // 枯树
       tree = {
         x: (Math.random() - 0.5) * WORLD_SIZE,
@@ -459,9 +467,10 @@ function initWorld() {
         h: 10 + Math.random() * 15,
         r: 2 + Math.random() * 3,
         type: 'dead',
-        color: `hsl(${30 + Math.random() * 20}, ${20 + Math.random() * 10}%, ${30 + Math.random() * 15}%)`
+        color: `hsl(${30 + Math.random() * 20}, ${20 + Math.random() * 10}%, ${30 + Math.random() * 15}%)`,
+        branches: Math.floor(Math.random() * 4) + 2
       };
-    } else {
+    } else if (treeType < 0.85) {
       // 灌木
       tree = {
         x: (Math.random() - 0.5) * WORLD_SIZE,
@@ -471,28 +480,51 @@ function initWorld() {
         type: 'bush',
         color: `hsl(${80 + Math.random() * 40}, ${40 + Math.random() * 30}%, ${30 + Math.random() * 20}%)`
       };
+    } else {
+      // 仙人掌
+      tree = {
+        x: (Math.random() - 0.5) * WORLD_SIZE,
+        z: (Math.random() - 0.5) * WORLD_SIZE,
+        h: 8 + Math.random() * 12,
+        r: 1.5 + Math.random() * 2,
+        type: 'cactus',
+        color: `hsl(${120 + Math.random() * 20}, ${60 + Math.random() * 20}%, ${30 + Math.random() * 15}%)`
+      };
     }
     trees.push(tree);
   }
   
   // 创建敌人
-  for (let i = 0; i < 25; i++) {
+  for (let i = 0; i < 30; i++) {
     spawnEnemy();
   }
   
   // 创建物品
-  for (let i = 0; i < 40; i++) {
+  for (let i = 0; i < 50; i++) {
     spawnItem();
+  }
+  
+  // 创建烟雾效果
+  for (let i = 0; i < 10; i++) {
+    smokeEffects.push({
+      x: (Math.random() - 0.5) * WORLD_SIZE * 0.5,
+      y: 20 + Math.random() * 30,
+      z: (Math.random() - 0.5) * WORLD_SIZE * 0.5,
+      size: 10 + Math.random() * 20,
+      speed: 0.02 + Math.random() * 0.03,
+      life: 1,
+      opacity: 0.3 + Math.random() * 0.3
+    });
   }
 }
 
 function spawnEnemy() {
   const angle = Math.random() * Math.PI * 2;
-  const dist = 50 + Math.random() * 100;
+  const dist = 50 + Math.random() * 150;
   const type = Math.random();
   let enemy;
   
-  if (type < 0.6) {
+  if (type < 0.5) {
     // 普通僵尸
     enemy = {
       x: player.x + Math.cos(angle) * dist,
@@ -506,9 +538,10 @@ function spawnEnemy() {
       lastAttack: 0,
       size: 8,
       color: '#8b0000',
-      animation: Math.random() * Math.PI * 2
+      animation: Math.random() * Math.PI * 2,
+      limbAnimation: Math.random() * Math.PI * 2
     };
-  } else if (type < 0.85) {
+  } else if (type < 0.75) {
     // 变异体
     enemy = {
       x: player.x + Math.cos(angle) * dist,
@@ -522,9 +555,11 @@ function spawnEnemy() {
       lastAttack: 0,
       size: 10,
       color: '#4a0080',
-      animation: Math.random() * Math.PI * 2
+      animation: Math.random() * Math.PI * 2,
+      limbAnimation: Math.random() * Math.PI * 2,
+      hasTentacles: Math.random() > 0.5
     };
-  } else {
+  } else if (type < 0.9) {
     // 精英怪
     enemy = {
       x: player.x + Math.cos(angle) * dist,
@@ -539,14 +574,36 @@ function spawnEnemy() {
       size: 14,
       color: '#ff4500',
       animation: Math.random() * Math.PI * 2,
-      hasShield: Math.random() > 0.5
+      limbAnimation: Math.random() * Math.PI * 2,
+      hasShield: Math.random() > 0.5,
+      hasWeapon: Math.random() > 0.5
+    };
+  } else {
+    // Boss
+    enemy = {
+      x: player.x + Math.cos(angle) * dist,
+      y: 0,
+      z: player.z + Math.sin(angle) * dist,
+      health: 300 + Math.random() * 200,
+      maxHealth: 500,
+      speed: 0.03 + Math.random() * 0.04,
+      damage: 25 + Math.random() * 35,
+      type: 'boss',
+      lastAttack: 0,
+      size: 20,
+      color: '#8b0000',
+      animation: Math.random() * Math.PI * 2,
+      limbAnimation: Math.random() * Math.PI * 2,
+      hasShield: true,
+      hasWeapon: true,
+      attackCooldown: 0
     };
   }
   enemies.push(enemy);
 }
 
 function spawnItem() {
-  const types = ['health', 'ammo', 'food', 'energy', 'weapon', 'armor'];
+  const types = ['health', 'ammo', 'food', 'energy', 'weapon', 'armor', 'special'];
   const type = types[Math.floor(Math.random() * types.length)];
   items.push({
     x: (Math.random() - 0.5) * WORLD_SIZE * 0.8,
@@ -554,7 +611,8 @@ function spawnItem() {
     z: (Math.random() - 0.5) * WORLD_SIZE * 0.8,
     type: type,
     collected: false,
-    glow: Math.random() * Math.PI * 2
+    glow: Math.random() * Math.PI * 2,
+    floatAnimation: Math.random() * Math.PI * 2
   });
 }
 
@@ -620,6 +678,7 @@ function update(deltaTime) {
     const dist = Math.sqrt(dx * dx + dz * dz);
     
     enemy.animation += 0.05;
+    enemy.limbAnimation += 0.08;
     
     if (dist > 2) {
       enemy.x += (dx / dist) * enemy.speed;
@@ -630,15 +689,20 @@ function update(deltaTime) {
         player.health -= enemy.damage;
         enemy.lastAttack = now;
         showMessage(`受到攻击！-${enemy.damage.toFixed(0)}生命`);
-        createParticles(player.x, player.y + 10, player.z, '#ef4444', 8);
+        createParticles(player.x, player.y + 10, player.z, '#ef4444', 12);
         createBloodStain(player.x, player.z);
       }
     }
     
-    if (dist > 200) {
+    if (dist > 250) {
       const angle = Math.random() * Math.PI * 2;
-      enemy.x = player.x + Math.cos(angle) * 100;
-      enemy.z = player.z + Math.sin(angle) * 100;
+      enemy.x = player.x + Math.cos(angle) * 120;
+      enemy.z = player.z + Math.sin(angle) * 120;
+    }
+    
+    // Boss特殊攻击
+    if (enemy.type === 'boss' && enemy.attackCooldown > 0) {
+      enemy.attackCooldown -= deltaTime;
     }
   });
   
@@ -656,6 +720,7 @@ function update(deltaTime) {
     const dist = Math.sqrt(dx * dx + dz * dz);
     
     item.glow += 0.05;
+    item.floatAnimation += 0.03;
     
     if (dist < 3 && keys['e']) {
       item.collected = true;
@@ -672,19 +737,40 @@ function update(deltaTime) {
     p.vy -= 0.01;
     p.life -= 0.02;
     p.size *= 0.98;
+    p.rotation += p.rotSpeed;
   });
   
   // 更新血迹
   bloodStains = bloodStains.filter(b => b.life > 0);
   bloodStains.forEach(b => {
     b.life -= 0.001;
+    b.size *= 1.001;
   });
   
   // 更新爆炸效果
   explosionEffects = explosionEffects.filter(e => e.life > 0);
   explosionEffects.forEach(e => {
-    e.radius += 0.5;
+    e.radius += 0.8;
     e.life -= 0.03;
+    e.particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.z += p.vz;
+      p.vy -= 0.02;
+      p.life -= 0.04;
+    });
+  });
+  
+  // 更新烟雾效果
+  smokeEffects.forEach(s => {
+    s.y += s.speed;
+    s.life -= 0.005;
+    s.size += 0.1;
+    if (s.life <= 0) {
+      s.y = 20 + Math.random() * 30;
+      s.life = 1;
+      s.size = 10 + Math.random() * 20;
+    }
   });
   
   player.health = Math.max(0, Math.min(100, player.health - 0.01));
@@ -696,8 +782,8 @@ function update(deltaTime) {
   
   score += deltaTime / 1000;
   
-  if (enemies.length < 20) spawnEnemy();
-  if (items.filter(i => !i.collected).length < 15) spawnItem();
+  if (enemies.length < 25) spawnEnemy();
+  if (items.filter(i => !i.collected).length < 20) spawnItem();
 }
 
 function shoot() {
@@ -725,7 +811,7 @@ function shoot() {
       
       if (dot > 0.95 && dist < 80) {
         enemy.health -= 25;
-        createParticles(enemy.x, enemy.y + 10, enemy.z, '#ef4444', 12);
+        createParticles(enemy.x, enemy.y + 10, enemy.z, '#ef4444', 15);
         createBloodStain(enemy.x, enemy.z);
         
         if (enemy.health <= 0) {
@@ -743,17 +829,19 @@ function shoot() {
 }
 
 function createMuzzleFlash() {
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 8; i++) {
     particles.push({
       x: player.x + Math.sin(player.yaw) * 5,
       y: player.y + 10,
       z: player.z + Math.cos(player.yaw) * 5,
-      vx: Math.sin(player.yaw) * 0.5 + (Math.random() - 0.5) * 0.3,
-      vy: 0.1 + Math.random() * 0.2,
-      vz: Math.cos(player.yaw) * 0.5 + (Math.random() - 0.5) * 0.3,
-      color: '#ffff00',
-      life: 0.3,
-      size: 3
+      vx: Math.sin(player.yaw) * 0.8 + (Math.random() - 0.5) * 0.4,
+      vy: 0.2 + Math.random() * 0.3,
+      vz: Math.cos(player.yaw) * 0.8 + (Math.random() - 0.5) * 0.4,
+      color: Math.random() > 0.5 ? '#ffff00' : '#ff8c00',
+      life: 0.4,
+      size: 3 + Math.random() * 2,
+      rotation: Math.random() * Math.PI * 2,
+      rotSpeed: (Math.random() - 0.5) * 0.2
     });
   }
 }
@@ -762,77 +850,89 @@ function createBloodStain(x, z) {
   bloodStains.push({
     x: x,
     z: z,
-    size: 2 + Math.random() * 3,
-    life: 1
+    size: 2 + Math.random() * 4,
+    life: 1,
+    opacity: 0.6 + Math.random() * 0.4
   });
 }
 
 function createExplosion(x, y, z) {
-  explosionEffects.push({
+  const explosion = {
     x: x,
     y: y,
     z: z,
     radius: 5,
-    life: 1
-  });
+    life: 1,
+    particles: []
+  };
   
-  for (let i = 0; i < 20; i++) {
-    particles.push({
+  for (let i = 0; i < 30; i++) {
+    explosion.particles.push({
       x: x,
       y: y,
       z: z,
-      vx: (Math.random() - 0.5) * 1,
-      vy: Math.random() * 0.5,
-      vz: (Math.random() - 0.5) * 1,
+      vx: (Math.random() - 0.5) * 1.5,
+      vy: Math.random() * 0.8,
+      vz: (Math.random() - 0.5) * 1.5,
       color: Math.random() > 0.5 ? '#ff4500' : '#ff8c00',
       life: 1,
-      size: 4 + Math.random() * 4
+      size: 3 + Math.random() * 5
     });
   }
+  
+  explosionEffects.push(explosion);
 }
 
 function collectItem(item) {
   switch(item.type) {
     case 'health':
-      player.health = Math.min(100, player.health + 25);
-      showMessage('+25 生命值');
+      player.health = Math.min(100, player.health + 30);
+      showMessage('+30 生命值');
       break;
     case 'ammo':
-      player.inventory[0].ammo = Math.min(player.inventory[0].maxAmmo, player.inventory[0].ammo + 6);
-      showMessage('+6 弹药');
+      player.inventory[0].ammo = Math.min(player.inventory[0].maxAmmo, player.inventory[0].ammo + 8);
+      showMessage('+8 弹药');
       break;
     case 'food':
-      player.survival = Math.min(100, player.survival + 20);
-      showMessage('+20 生存指数');
+      player.survival = Math.min(100, player.survival + 25);
+      showMessage('+25 生存指数');
       break;
     case 'energy':
-      player.stamina = Math.min(100, player.stamina + 30);
-      showMessage('+30 体力');
+      player.stamina = Math.min(100, player.stamina + 40);
+      showMessage('+40 体力');
       break;
     case 'weapon':
-      player.inventory[0].maxAmmo += 6;
-      showMessage('+6 最大弹药');
+      player.inventory[0].maxAmmo += 8;
+      showMessage('+8 最大弹药');
       break;
     case 'armor':
-      player.health = Math.min(100, player.health + 10);
-      player.survival = Math.min(100, player.survival + 10);
-      showMessage('+10 生命/生存');
+      player.health = Math.min(100, player.health + 15);
+      player.survival = Math.min(100, player.survival + 15);
+      showMessage('+15 生命/生存');
+      break;
+    case 'special':
+      player.health = Math.min(100, player.health + 50);
+      player.stamina = Math.min(100, player.stamina + 50);
+      player.survival = Math.min(100, player.survival + 50);
+      showMessage('+50 全属性');
       break;
   }
   score += 50;
-  createParticles(item.x, item.y + 5, item.z, '#22c55e', 10);
+  createParticles(item.x, item.y + 5, item.z, '#22c55e', 15);
 }
 
 function createParticles(x, y, z, color, count) {
   for (let i = 0; i < count; i++) {
     particles.push({
       x, y, z,
-      vx: (Math.random() - 0.5) * 0.5,
-      vy: Math.random() * 0.3,
-      vz: (Math.random() - 0.5) * 0.5,
+      vx: (Math.random() - 0.5) * 0.6,
+      vy: Math.random() * 0.4,
+      vz: (Math.random() - 0.5) * 0.6,
       color: color,
       life: 1,
-      size: 2 + Math.random() * 3
+      size: 2 + Math.random() * 4,
+      rotation: Math.random() * Math.PI * 2,
+      rotSpeed: (Math.random() - 0.5) * 0.1
     });
   }
 }
@@ -849,52 +949,114 @@ function render() {
   ctx.fillStyle = '#1a1a2e';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   
-  // 绘制天空
-  const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height * 0.6);
-  gradient.addColorStop(0, '#0f0f23');
-  gradient.addColorStop(0.3, '#1a1a2e');
-  gradient.addColorStop(0.6, '#2d1b4e');
-  gradient.addColorStop(1, '#4a1942');
-  ctx.fillStyle = gradient;
+  // 绘制天空（更细腻）
+  const skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height * 0.6);
+  skyGradient.addColorStop(0, '#0a0a1a');
+  skyGradient.addColorStop(0.2, '#0f0f23');
+  skyGradient.addColorStop(0.4, '#1a1a2e');
+  skyGradient.addColorStop(0.6, '#2d1b4e');
+  skyGradient.addColorStop(0.8, '#4a1942');
+  skyGradient.addColorStop(1, '#6b2150');
+  ctx.fillStyle = skyGradient;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   
-  // 绘制月亮
-  ctx.fillStyle = '#e2e8f0';
-  ctx.shadowColor = '#e2e8f0';
-  ctx.shadowBlur = 30;
+  // 绘制星云效果
+  for (let i = 0; i < 5; i++) {
+    const x = canvas.width * (0.1 + i * 0.2);
+    const y = canvas.height * 0.15;
+    const nebulaGradient = ctx.createRadialGradient(x, y, 0, x, y, 100);
+    nebulaGradient.addColorStop(0, `rgba(${100 + i * 30}, ${50 + i * 20}, ${150 + i * 20}, 0.1)`);
+    nebulaGradient.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = nebulaGradient;
+    ctx.fillRect(x - 100, y - 100, 200, 200);
+  }
+  
+  // 绘制月亮（更细腻）
+  const moonX = canvas.width * 0.8;
+  const moonY = canvas.height * 0.12;
+  const moonRadius = 50;
+  
+  // 月亮光晕
+  const moonGlow = ctx.createRadialGradient(moonX, moonY, moonRadius * 0.5, moonX, moonY, moonRadius * 3);
+  moonGlow.addColorStop(0, 'rgba(255,255,200,0.2)');
+  moonGlow.addColorStop(0.5, 'rgba(255,255,200,0.1)');
+  moonGlow.addColorStop(1, 'rgba(255,255,200,0)');
+  ctx.fillStyle = moonGlow;
   ctx.beginPath();
-  ctx.arc(canvas.width * 0.8, canvas.height * 0.15, 40, 0, Math.PI * 2);
+  ctx.arc(moonX, moonY, moonRadius * 3, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // 月亮本体
+  ctx.fillStyle = '#f0f0e0';
+  ctx.shadowColor = '#f0f0e0';
+  ctx.shadowBlur = 40;
+  ctx.beginPath();
+  ctx.arc(moonX, moonY, moonRadius, 0, Math.PI * 2);
   ctx.fill();
   ctx.shadowBlur = 0;
   
-  // 绘制星星
+  // 月球陨石坑
+  ctx.fillStyle = 'rgba(200,200,180,0.3)';
+  ctx.beginPath();
+  ctx.arc(moonX - 15, moonY - 10, 8, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(moonX + 20, moonY + 15, 6, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(moonX + 5, moonY + 25, 4, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // 绘制星星（更细腻）
   ctx.fillStyle = '#ffffff';
-  for (let i = 0; i < 200; i++) {
+  for (let i = 0; i < 300; i++) {
     const sx = (Math.sin(i * 132.1) * 0.5 + 0.5) * canvas.width;
     const sy = (Math.cos(i * 73.7) * 0.5 + 0.5) * canvas.height * 0.4;
-    const size = Math.sin(Date.now() / 1000 + i) * 0.5 + 1;
-    ctx.globalAlpha = 0.3 + Math.sin(Date.now() / 2000 + i) * 0.3;
-    ctx.fillRect(sx, sy, size, size);
+    const size = Math.sin(Date.now() / 1000 + i) * 0.8 + 1.2;
+    const brightness = 0.3 + Math.sin(Date.now() / 2000 + i) * 0.3;
+    
+    ctx.globalAlpha = brightness;
+    
+    // 星星发光效果
+    if (size > 1.5) {
+      ctx.shadowColor = '#ffffff';
+      ctx.shadowBlur = 3;
+    }
+    
+    ctx.beginPath();
+    ctx.arc(sx, sy, size, 0, Math.PI * 2);
+    ctx.fill();
+    
+    ctx.shadowBlur = 0;
   }
   ctx.globalAlpha = 1;
   
-  // 绘制地面
+  // 绘制地面（更细腻）
   const groundGradient = ctx.createLinearGradient(0, canvas.height * 0.6, 0, canvas.height);
-  groundGradient.addColorStop(0, '#1a1a0a');
-  groundGradient.addColorStop(0.3, '#0d1117');
+  groundGradient.addColorStop(0, '#2a2a1a');
+  groundGradient.addColorStop(0.2, '#1a1a0a');
+  groundGradient.addColorStop(0.5, '#0d1117');
   groundGradient.addColorStop(1, '#0a0a0a');
   ctx.fillStyle = groundGradient;
   ctx.fillRect(0, canvas.height * 0.6, canvas.width, canvas.height * 0.4);
   
-  // 绘制地面纹理
-  ctx.strokeStyle = 'rgba(255,255,255,0.05)';
-  ctx.lineWidth = 1;
-  for (let i = 0; i < 20; i++) {
-    const y = canvas.height * 0.6 + i * 10;
+  // 绘制地面纹理（更细腻）
+  for (let i = 0; i < 50; i++) {
+    const y = canvas.height * 0.6 + i * 8;
+    ctx.strokeStyle = `rgba(255,255,255,${0.02 + Math.sin(i) * 0.01})`;
+    ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(0, y);
     ctx.lineTo(canvas.width, y);
     ctx.stroke();
+  }
+  
+  // 绘制地面噪点
+  for (let i = 0; i < 100; i++) {
+    const x = Math.random() * canvas.width;
+    const y = canvas.height * 0.6 + Math.random() * canvas.height * 0.4;
+    ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.05})`;
+    ctx.fillRect(x, y, 1, 1);
   }
   
   // 绘制血迹
@@ -909,8 +1071,15 @@ function render() {
       const screenX = canvas.width / 2 + rotX * scale;
       const screenY = canvas.height * 0.6;
       
-      ctx.globalAlpha = b.life * 0.6;
-      ctx.fillStyle = '#8b0000';
+      ctx.globalAlpha = b.life * b.opacity;
+      
+      // 血迹渐变
+      const bloodGradient = ctx.createRadialGradient(screenX, screenY, 0, screenX, screenY, b.size * scale);
+      bloodGradient.addColorStop(0, '#8b0000');
+      bloodGradient.addColorStop(0.5, '#6b0000');
+      bloodGradient.addColorStop(1, 'rgba(107,0,0,0)');
+      ctx.fillStyle = bloodGradient;
+      
       ctx.beginPath();
       ctx.ellipse(screenX, screenY, b.size * scale, b.size * scale * 0.3, 0, 0, Math.PI * 2);
       ctx.fill();
@@ -928,7 +1097,7 @@ function render() {
     const rotX = relX * Math.cos(player.yaw) - relZ * Math.sin(player.yaw);
     const rotZ = relX * Math.sin(player.yaw) + relZ * Math.cos(player.yaw);
     
-    if (rotZ > 0.1 && rotZ < 200) {
+    if (rotZ > 0.1 && rotZ < 250) {
       const scale = 200 / rotZ;
       const screenX = canvas.width / 2 + rotX * scale;
       const screenY = canvas.height * 0.6 - b.h * scale / 2;
@@ -943,8 +1112,11 @@ function render() {
         color: b.color,
         buildingType: b.type,
         hasSmoke: b.hasSmoke,
+        hasChimney: b.hasChimney,
         windows: b.windows,
-        damage: b.damage
+        damage: b.damage,
+        debris: b.debris,
+        hasRoof: b.hasRoof
       });
     }
   });
@@ -956,7 +1128,7 @@ function render() {
     const rotX = relX * Math.cos(player.yaw) - relZ * Math.sin(player.yaw);
     const rotZ = relX * Math.sin(player.yaw) + relZ * Math.cos(player.yaw);
     
-    if (rotZ > 0.1 && rotZ < 150) {
+    if (rotZ > 0.1 && rotZ < 200) {
       const scale = 200 / rotZ;
       const screenX = canvas.width / 2 + rotX * scale;
       const screenY = canvas.height * 0.6;
@@ -969,7 +1141,9 @@ function render() {
         r: t.r * scale,
         d: rotZ,
         treeType: t.type,
-        color: t.color
+        color: t.color,
+        leaves: t.leaves,
+        branches: t.branches
       });
     }
   });
@@ -981,7 +1155,7 @@ function render() {
     const rotX = relX * Math.cos(player.yaw) - relZ * Math.sin(player.yaw);
     const rotZ = relX * Math.sin(player.yaw) + relZ * Math.cos(player.yaw);
     
-    if (rotZ > 0.1 && rotZ < 150) {
+    if (rotZ > 0.1 && rotZ < 200) {
       const scale = 200 / rotZ;
       const screenX = canvas.width / 2 + rotX * scale;
       const screenY = canvas.height * 0.6 - 10 * scale;
@@ -997,7 +1171,10 @@ function render() {
         enemyType: e.type,
         color: e.color,
         animation: e.animation,
-        hasShield: e.hasShield
+        limbAnimation: e.limbAnimation,
+        hasShield: e.hasShield,
+        hasWeapon: e.hasWeapon,
+        hasTentacles: e.hasTentacles
       });
     }
   });
@@ -1010,10 +1187,10 @@ function render() {
     const rotX = relX * Math.cos(player.yaw) - relZ * Math.sin(player.yaw);
     const rotZ = relX * Math.sin(player.yaw) + relZ * Math.cos(player.yaw);
     
-    if (rotZ > 0.1 && rotZ < 100) {
+    if (rotZ > 0.1 && rotZ < 150) {
       const scale = 200 / rotZ;
       const screenX = canvas.width / 2 + rotX * scale;
-      const screenY = canvas.height * 0.6 - 3 * scale;
+      const screenY = canvas.height * 0.6 - 3 * scale + Math.sin(item.floatAnimation) * 5;
       
       objects3D.push({
         type: 'item',
@@ -1024,6 +1201,30 @@ function render() {
         itemType: item.type,
         glow: item.glow
       });
+    }
+  });
+  
+  // 烟雾效果
+  smokeEffects.forEach(s => {
+    const relX = s.x - player.x;
+    const relZ = s.z - player.z;
+    const rotX = relX * Math.cos(player.yaw) - relZ * Math.sin(player.yaw);
+    const rotZ = relX * Math.sin(player.yaw) + relZ * Math.cos(player.yaw);
+    
+    if (rotZ > 0.1 && rotZ < 150) {
+      const scale = 200 / rotZ;
+      const screenX = canvas.width / 2 + rotX * scale;
+      const screenY = canvas.height * 0.6 - s.y * scale;
+      
+      ctx.globalAlpha = s.life * s.opacity;
+      const smokeGradient = ctx.createRadialGradient(screenX, screenY, 0, screenX, screenY, s.size * scale);
+      smokeGradient.addColorStop(0, 'rgba(100,100,100,0.3)');
+      smokeGradient.addColorStop(1, 'rgba(100,100,100,0)');
+      ctx.fillStyle = smokeGradient;
+      ctx.beginPath();
+      ctx.arc(screenX, screenY, s.size * scale, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
     }
   });
   
@@ -1039,13 +1240,40 @@ function render() {
       const screenX = canvas.width / 2 + rotX * scale;
       const screenY = canvas.height * 0.6 - e.y * scale;
       
+      // 爆炸光环
       ctx.globalAlpha = e.life;
       ctx.strokeStyle = '#ff4500';
       ctx.lineWidth = 3;
       ctx.beginPath();
       ctx.arc(screenX, screenY, e.radius * scale, 0, Math.PI * 2);
       ctx.stroke();
+      
+      // 爆炸内环
+      ctx.strokeStyle = '#ffff00';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(screenX, screenY, e.radius * scale * 0.7, 0, Math.PI * 2);
+      ctx.stroke();
       ctx.globalAlpha = 1;
+      
+      // 爆炸粒子
+      e.particles.forEach(p => {
+        const pRotX = (p.x - player.x) * Math.cos(player.yaw) - (p.z - player.z) * Math.sin(player.yaw);
+        const pRotZ = (p.x - player.x) * Math.sin(player.yaw) + (p.z - player.z) * Math.cos(player.yaw);
+        
+        if (pRotZ > 0.1) {
+          const pScale = 200 / pRotZ;
+          const pScreenX = canvas.width / 2 + pRotX * pScale;
+          const pScreenY = canvas.height * 0.6 - p.y * pScale;
+          
+          ctx.globalAlpha = p.life;
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.arc(pScreenX, pScreenY, p.size * pScale, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        }
+      });
     }
   });
   
@@ -1063,9 +1291,15 @@ function render() {
       
       ctx.globalAlpha = p.life;
       ctx.fillStyle = p.color;
+      
+      ctx.save();
+      ctx.translate(screenX, screenY);
+      ctx.rotate(p.rotation);
       ctx.beginPath();
-      ctx.arc(screenX, screenY, p.size * scale, 0, Math.PI * 2);
+      ctx.arc(0, 0, p.size * scale, 0, Math.PI * 2);
       ctx.fill();
+      ctx.restore();
+      
       ctx.globalAlpha = 1;
     }
   });
@@ -1075,127 +1309,276 @@ function render() {
   
   objects3D.forEach(obj => {
     if (obj.type === 'building') {
+      // 绘制建筑阴影
+      ctx.fillStyle = 'rgba(0,0,0,0.3)';
+      ctx.fillRect(obj.x - obj.w/2 + 5, obj.y + obj.h, obj.w, 10);
+      
       // 绘制建筑主体
-      ctx.fillStyle = obj.color;
+      const buildingGradient = ctx.createLinearGradient(obj.x - obj.w/2, obj.y, obj.x + obj.w/2, obj.y);
+      buildingGradient.addColorStop(0, obj.color);
+      buildingGradient.addColorStop(0.5, lightenColor(obj.color, 10));
+      buildingGradient.addColorStop(1, obj.color);
+      ctx.fillStyle = buildingGradient;
       ctx.fillRect(obj.x - obj.w/2, obj.y, obj.w, obj.h);
       
       // 绘制建筑损坏效果
       if (obj.damage > 0) {
-        ctx.fillStyle = 'rgba(0,0,0,0.3)';
+        ctx.fillStyle = 'rgba(0,0,0,0.4)';
         ctx.fillRect(obj.x - obj.w/2, obj.y, obj.w * obj.damage, obj.h * 0.3);
+        
+        // 碎片效果
+        for (let i = 0; i < obj.debris; i++) {
+          const debrisX = obj.x - obj.w/2 + Math.random() * obj.w;
+          const debrisY = obj.y + obj.h * 0.7 + Math.random() * obj.h * 0.3;
+          ctx.fillStyle = 'rgba(100,100,100,0.5)';
+          ctx.fillRect(debrisX, debrisY, 3, 3);
+        }
       }
       
       // 绘制窗户
       if (obj.windows) {
-        ctx.fillStyle = 'rgba(255,255,200,0.3)';
-        const windowSize = Math.min(obj.w, obj.h) * 0.15;
+        const windowSize = Math.min(obj.w, obj.h) * 0.12;
         for (let i = 0; i < obj.windows; i++) {
           const wx = obj.x - obj.w/2 + (i + 1) * obj.w / (obj.windows + 1) - windowSize/2;
           const wy = obj.y + obj.h * 0.3;
+          
+          // 窗户发光
+          const windowGlow = ctx.createRadialGradient(wx + windowSize/2, wy + windowSize/2, 0, wx + windowSize/2, wy + windowSize/2, windowSize);
+          windowGlow.addColorStop(0, 'rgba(255,255,200,0.4)');
+          windowGlow.addColorStop(1, 'rgba(255,255,200,0)');
+          ctx.fillStyle = windowGlow;
+          ctx.fillRect(wx - windowSize/2, wy - windowSize/2, windowSize * 2, windowSize * 2);
+          
+          ctx.fillStyle = 'rgba(255,255,200,0.6)';
           ctx.fillRect(wx, wy, windowSize, windowSize);
         }
       }
       
-      // 绘制烟雾效果
-      if (obj.hasSmoke) {
-        ctx.fillStyle = 'rgba(100,100,100,0.3)';
-        for (let i = 0; i < 3; i++) {
-          const sx = obj.x + Math.sin(Date.now() / 500 + i) * 10;
-          const sy = obj.y - 20 - i * 15;
-          ctx.beginPath();
-          ctx.arc(sx, sy, 8 + i * 3, 0, Math.PI * 2);
-          ctx.fill();
-        }
+      // 绘制屋顶
+      if (obj.hasRoof) {
+        ctx.fillStyle = darkenColor(obj.color, 20);
+        ctx.beginPath();
+        ctx.moveTo(obj.x - obj.w/2 - 5, obj.y);
+        ctx.lineTo(obj.x, obj.y - obj.h * 0.2);
+        ctx.lineTo(obj.x + obj.w/2 + 5, obj.y);
+        ctx.closePath();
+        ctx.fill();
+      }
+      
+      // 绘制烟囱
+      if (obj.hasChimney) {
+        ctx.fillStyle = '#4a4a4a';
+        ctx.fillRect(obj.x + obj.w/4, obj.y - obj.h * 0.3, obj.w * 0.1, obj.h * 0.3);
       }
       
       // 绘制建筑边框
-      ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+      ctx.strokeStyle = 'rgba(0,0,0,0.4)';
       ctx.lineWidth = 2;
       ctx.strokeRect(obj.x - obj.w/2, obj.y, obj.w, obj.h);
       
     } else if (obj.type === 'tree') {
       if (obj.treeType === 'normal') {
-        // 普通树
-        ctx.fillStyle = '#2d1b00';
-        ctx.fillRect(obj.x - 2, obj.y - obj.h * 0.3, 4, obj.h * 0.3);
-        ctx.fillStyle = obj.color;
-        ctx.beginPath();
-        ctx.arc(obj.x, obj.y - obj.h * 0.5, obj.r, 0, Math.PI * 2);
-        ctx.fill();
+        // 树干
+        ctx.fillStyle = '#3d2b1f';
+        ctx.fillRect(obj.x - 3, obj.y - obj.h * 0.4, 6, obj.h * 0.4);
+        
+        // 树干纹理
+        ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < 3; i++) {
+          const ty = obj.y - obj.h * 0.1 - i * obj.h * 0.1;
+          ctx.beginPath();
+          ctx.moveTo(obj.x - 2, ty);
+          ctx.lineTo(obj.x + 2, ty);
+          ctx.stroke();
+        }
+        
+        // 树叶（多层）
+        for (let i = 0; i < obj.leaves; i++) {
+          const leafY = obj.y - obj.h * 0.5 - i * obj.h * 0.15;
+          const leafR = obj.r * (1 - i * 0.2);
+          
+          ctx.fillStyle = obj.color;
+          ctx.beginPath();
+          ctx.arc(obj.x, leafY, leafR, 0, Math.PI * 2);
+          ctx.fill();
+          
+          // 树叶高光
+          ctx.fillStyle = 'rgba(255,255,255,0.1)';
+          ctx.beginPath();
+          ctx.arc(obj.x - leafR * 0.3, leafY - leafR * 0.3, leafR * 0.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        
       } else if (obj.treeType === 'dead') {
         // 枯树
         ctx.strokeStyle = obj.color;
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 4;
         ctx.beginPath();
         ctx.moveTo(obj.x, obj.y);
         ctx.lineTo(obj.x, obj.y - obj.h);
         ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(obj.x, obj.y - obj.h * 0.7);
-        ctx.lineTo(obj.x - obj.r, obj.y - obj.h * 0.9);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(obj.x, obj.y - obj.h * 0.5);
-        ctx.lineTo(obj.x + obj.r, obj.y - obj.h * 0.8);
-        ctx.stroke();
-      } else {
+        
+        // 枯树枝
+        ctx.lineWidth = 2;
+        for (let i = 0; i < obj.branches; i++) {
+          const branchY = obj.y - obj.h * (0.3 + i * 0.2);
+          const branchDir = i % 2 === 0 ? -1 : 1;
+          ctx.beginPath();
+          ctx.moveTo(obj.x, branchY);
+          ctx.lineTo(obj.x + obj.r * branchDir, branchY - obj.h * 0.1);
+          ctx.stroke();
+        }
+        
+      } else if (obj.treeType === 'bush') {
         // 灌木
         ctx.fillStyle = obj.color;
         ctx.beginPath();
         ctx.arc(obj.x, obj.y - obj.h/2, obj.r, 0, Math.PI * 2);
         ctx.fill();
+        
+        // 灌木阴影
+        ctx.fillStyle = 'rgba(0,0,0,0.2)';
+        ctx.beginPath();
+        ctx.arc(obj.x + obj.r * 0.2, obj.y - obj.h/2 + obj.r * 0.2, obj.r * 0.8, 0, Math.PI * 2);
+        ctx.fill();
+        
+      } else if (obj.treeType === 'cactus') {
+        // 仙人掌
+        ctx.fillStyle = obj.color;
+        ctx.fillRect(obj.x - obj.r/2, obj.y - obj.h, obj.r, obj.h);
+        
+        // 仙人掌分支
+        ctx.fillRect(obj.x - obj.r * 1.5, obj.y - obj.h * 0.7, obj.r, obj.h * 0.3);
+        ctx.fillRect(obj.x + obj.r * 0.5, obj.y - obj.h * 0.5, obj.r, obj.h * 0.2);
+        
+        // 仙人掌刺
+        ctx.strokeStyle = '#2d5a2d';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < 5; i++) {
+          const spikeY = obj.y - obj.h * 0.2 - i * obj.h * 0.15;
+          ctx.beginPath();
+          ctx.moveTo(obj.x - obj.r/2, spikeY);
+          ctx.lineTo(obj.x - obj.r, spikeY - 3);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(obj.x + obj.r/2, spikeY);
+          ctx.lineTo(obj.x + obj.r, spikeY - 3);
+          ctx.stroke();
+        }
       }
       
     } else if (obj.type === 'enemy') {
-      // 绘制敌人身体
-      ctx.fillStyle = obj.color;
       const bodyWidth = obj.size * 0.8;
       const bodyHeight = obj.size * 1.2;
       
+      // 敌人阴影
+      ctx.fillStyle = 'rgba(0,0,0,0.3)';
+      ctx.beginPath();
+      ctx.ellipse(obj.x, obj.y, obj.size * 0.6, obj.size * 0.2, 0, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // 身体动画
+      const wobble = Math.sin(obj.animation) * 3;
+      const limbWobble = Math.sin(obj.limbAnimation) * 5;
+      
+      // 绘制触手（变异体）
+      if (obj.hasTentacles) {
+        ctx.strokeStyle = obj.color;
+        ctx.lineWidth = 3;
+        for (let i = 0; i < 4; i++) {
+          const tentAngle = (i / 4) * Math.PI * 2 + obj.animation;
+          const tentX = obj.x + Math.cos(tentAngle) * obj.size * 0.8;
+          const tentY = obj.y - bodyHeight/2 + Math.sin(tentAngle) * obj.size * 0.3;
+          ctx.beginPath();
+          ctx.moveTo(obj.x, obj.y - bodyHeight/2);
+          ctx.quadraticCurveTo(tentX, tentY, tentX + Math.cos(tentAngle) * 10, tentY + 10);
+          ctx.stroke();
+        }
+      }
+      
       // 身体
-      ctx.fillRect(obj.x - bodyWidth/2, obj.y - bodyHeight, bodyWidth, bodyHeight);
+      const bodyGradient = ctx.createLinearGradient(obj.x - bodyWidth/2, obj.y - bodyHeight, obj.x + bodyWidth/2, obj.y);
+      bodyGradient.addColorStop(0, lightenColor(obj.color, 20));
+      bodyGradient.addColorStop(1, obj.color);
+      ctx.fillStyle = bodyGradient;
+      ctx.fillRect(obj.x - bodyWidth/2 + wobble, obj.y - bodyHeight, bodyWidth, bodyHeight);
       
       // 头部
+      ctx.fillStyle = obj.color;
       ctx.beginPath();
-      ctx.arc(obj.x, obj.y - bodyHeight - obj.size * 0.3, obj.size * 0.35, 0, Math.PI * 2);
+      ctx.arc(obj.x + wobble, obj.y - bodyHeight - obj.size * 0.3, obj.size * 0.35, 0, Math.PI * 2);
       ctx.fill();
       
-      // 眼睛
+      // 眼睛（发光效果）
+      ctx.shadowColor = '#ff0000';
+      ctx.shadowBlur = 10;
       ctx.fillStyle = '#ff0000';
       ctx.beginPath();
-      ctx.arc(obj.x - obj.size * 0.15, obj.y - bodyHeight - obj.size * 0.35, obj.size * 0.08, 0, Math.PI * 2);
+      ctx.arc(obj.x - obj.size * 0.15 + wobble, obj.y - bodyHeight - obj.size * 0.35, obj.size * 0.08, 0, Math.PI * 2);
       ctx.fill();
       ctx.beginPath();
-      ctx.arc(obj.x + obj.size * 0.15, obj.y - bodyHeight - obj.size * 0.35, obj.size * 0.08, 0, Math.PI * 2);
+      ctx.arc(obj.x + obj.size * 0.15 + wobble, obj.y - bodyHeight - obj.size * 0.35, obj.size * 0.08, 0, Math.PI * 2);
       ctx.fill();
+      ctx.shadowBlur = 0;
+      
+      // 武器
+      if (obj.hasWeapon) {
+        ctx.fillStyle = '#666';
+        ctx.fillRect(obj.x + bodyWidth/2 + wobble, obj.y - bodyHeight * 0.8, obj.size * 0.3, obj.size * 0.1);
+      }
       
       // 护盾效果
       if (obj.hasShield) {
         ctx.strokeStyle = 'rgba(100,200,255,0.5)';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 3;
+        ctx.setLineDash([5, 5]);
         ctx.beginPath();
-        ctx.arc(obj.x, obj.y - bodyHeight/2, obj.size * 0.8, 0, Math.PI * 2);
+        ctx.arc(obj.x + wobble, obj.y - bodyHeight/2, obj.size * 0.9, 0, Math.PI * 2);
         ctx.stroke();
+        ctx.setLineDash([]);
       }
       
-      // 血条
-      ctx.fillStyle = '#000';
-      ctx.fillRect(obj.x - obj.size/2, obj.y - obj.size - 12, obj.size, 6);
-      ctx.fillStyle = obj.health > obj.maxHealth * 0.3 ? '#22c55e' : '#ef4444';
-      const healthWidth = (obj.health / obj.maxHealth) * obj.size;
-      ctx.fillRect(obj.x - obj.size/2, obj.y - obj.size - 12, healthWidth, 6);
+      // 血条背景
+      ctx.fillStyle = 'rgba(0,0,0,0.5)';
+      ctx.fillRect(obj.x - obj.size/2, obj.y - obj.size - 16, obj.size, 8);
       
-      // 动画效果
-      const wobble = Math.sin(obj.animation) * 2;
-      ctx.fillStyle = obj.color;
-      ctx.fillRect(obj.x - bodyWidth/2 + wobble, obj.y - bodyHeight, bodyWidth, bodyHeight);
+      // 血条
+      const healthPercent = obj.health / obj.maxHealth;
+      const healthColor = healthPercent > 0.5 ? '#22c55e' : healthPercent > 0.25 ? '#f59e0b' : '#ef4444';
+      ctx.fillStyle = healthColor;
+      const healthWidth = healthPercent * obj.size;
+      ctx.fillRect(obj.x - obj.size/2, obj.y - obj.size - 16, healthWidth, 8);
+      
+      // 血条边框
+      ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(obj.x - obj.size/2, obj.y - obj.size - 16, obj.size, 8);
+      
+      // Boss标识
+      if (obj.enemyType === 'boss') {
+        ctx.fillStyle = '#ff4500';
+        ctx.font = `${obj.size * 0.4}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.fillText('BOSS', obj.x + wobble, obj.y - obj.size - 25);
+      }
       
     } else if (obj.type === 'item') {
-      // 绘制物品发光效果
+      // 物品发光效果
       const glowIntensity = Math.sin(obj.glow) * 0.3 + 0.7;
       ctx.shadowColor = getItemColor(obj.itemType);
-      ctx.shadowBlur = 10 * glowIntensity;
+      ctx.shadowBlur = 15 * glowIntensity;
       
+      // 物品光圈
+      const glowGradient = ctx.createRadialGradient(obj.x, obj.y, 0, obj.x, obj.y, obj.size * 2);
+      glowGradient.addColorStop(0, `${getItemColor(obj.itemType)}40`);
+      glowGradient.addColorStop(1, `${getItemColor(obj.itemType)}00`);
+      ctx.fillStyle = glowGradient;
+      ctx.beginPath();
+      ctx.arc(obj.x, obj.y, obj.size * 2, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // 物品本体
       ctx.fillStyle = getItemColor(obj.itemType);
       ctx.beginPath();
       ctx.arc(obj.x, obj.y, obj.size * glowIntensity, 0, Math.PI * 2);
@@ -1203,9 +1586,9 @@ function render() {
       
       ctx.shadowBlur = 0;
       
-      // 绘制物品图标
+      // 物品图标
       ctx.fillStyle = '#fff';
-      ctx.font = `${obj.size * 1.5}px Arial`;
+      ctx.font = `${obj.size * 1.8}px Arial`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(getItemIcon(obj.itemType), obj.x, obj.y);
@@ -1214,14 +1597,30 @@ function render() {
   
   // 绘制伤害效果
   if (player.health < 30) {
-    ctx.fillStyle = `rgba(255,0,0,${0.2 + Math.sin(Date.now() / 200) * 0.1})`;
+    const damageIntensity = 0.2 + Math.sin(Date.now() / 200) * 0.1;
+    ctx.fillStyle = `rgba(255,0,0,${damageIntensity})`;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // 伤害边缘效果
+    const edgeGradient = ctx.createRadialGradient(canvas.width/2, canvas.height/2, canvas.width * 0.3, canvas.width/2, canvas.height/2, canvas.width * 0.7);
+    edgeGradient.addColorStop(0, 'rgba(255,0,0,0)');
+    edgeGradient.addColorStop(1, `rgba(255,0,0,${damageIntensity * 0.5})`);
+    ctx.fillStyle = edgeGradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
   
   // 绘制冲刺效果
   if (player.isSprinting) {
-    ctx.fillStyle = 'rgba(255,255,255,0.05)';
+    ctx.fillStyle = 'rgba(255,255,255,0.03)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // 冲刺模糊效果
+    ctx.fillStyle = 'rgba(255,255,255,0.02)';
+    for (let i = 0; i < 5; i++) {
+      const blurX = Math.random() * canvas.width;
+      const blurY = Math.random() * canvas.height;
+      ctx.fillRect(blurX, blurY, 100, 2);
+    }
   }
   
   // 绘制小地图
@@ -1231,6 +1630,24 @@ function render() {
   updateUI();
 }
 
+function lightenColor(color, percent) {
+  const num = parseInt(color.replace('#', ''), 16);
+  const amt = Math.round(2.55 * percent);
+  const R = Math.min(255, (num >> 16) + amt);
+  const G = Math.min(255, ((num >> 8) & 0x00FF) + amt);
+  const B = Math.min(255, (num & 0x0000FF) + amt);
+  return `#${(1 << 24 | R << 16 | G << 8 | B).toString(16).slice(1)}`;
+}
+
+function darkenColor(color, percent) {
+  const num = parseInt(color.replace('#', ''), 16);
+  const amt = Math.round(2.55 * percent);
+  const R = Math.max(0, (num >> 16) - amt);
+  const G = Math.max(0, ((num >> 8) & 0x00FF) - amt);
+  const B = Math.max(0, (num & 0x0000FF) - amt);
+  return `#${(1 << 24 | R << 16 | G << 8 | B).toString(16).slice(1)}`;
+}
+
 function getItemColor(type) {
   const colors = {
     health: '#ef4444',
@@ -1238,7 +1655,8 @@ function getItemColor(type) {
     food: '#22c55e',
     energy: '#3b82f6',
     weapon: '#8b5cf6',
-    armor: '#06b6d4'
+    armor: '#06b6d4',
+    special: '#ec4899'
   };
   return colors[type] || '#fff';
 }
@@ -1250,7 +1668,8 @@ function getItemIcon(type) {
     food: '🍖',
     energy: '⚡',
     weapon: '⚔️',
-    armor: '🛡️'
+    armor: '🛡️',
+    special: '⭐'
   };
   return icons[type] || '❓';
 }
@@ -1268,7 +1687,7 @@ function renderMinimap() {
     const rx = (b.x - player.x) * scale + centerX;
     const rz = (b.z - player.z) * scale + centerY;
     if (rx > 0 && rx < 180 && rz > 0 && rz < 180) {
-      minimapCtx.fillStyle = '#4a5568';
+      minimapCtx.fillStyle = b.type === 'ruin' ? '#5a4a3a' : '#4a5568';
       minimapCtx.fillRect(rx - 3, rz - 3, 6, 6);
     }
   });
@@ -1278,9 +1697,9 @@ function renderMinimap() {
     const rx = (e.x - player.x) * scale + centerX;
     const rz = (e.z - player.z) * scale + centerY;
     if (rx > 0 && rx < 180 && rz > 0 && rz < 180) {
-      minimapCtx.fillStyle = e.type === 'elite' ? '#7c3aed' : '#ef4444';
+      minimapCtx.fillStyle = e.type === 'boss' ? '#ff4500' : e.type === 'elite' ? '#7c3aed' : '#ef4444';
       minimapCtx.beginPath();
-      minimapCtx.arc(rx, rz, 3, 0, Math.PI * 2);
+      minimapCtx.arc(rx, rz, e.type === 'boss' ? 5 : 3, 0, Math.PI * 2);
       minimapCtx.fill();
     }
   });
@@ -1301,17 +1720,24 @@ function renderMinimap() {
   // 绘制玩家
   minimapCtx.fillStyle = '#3b82f6';
   minimapCtx.beginPath();
-  minimapCtx.arc(centerX, centerY, 4, 0, Math.PI * 2);
+  minimapCtx.arc(centerX, centerY, 5, 0, Math.PI * 2);
   minimapCtx.fill();
   
   // 绘制方向
-  const dirX = Math.sin(player.yaw) * 10;
-  const dirZ = Math.cos(player.yaw) * 10;
+  const dirX = Math.sin(player.yaw) * 15;
+  const dirZ = Math.cos(player.yaw) * 15;
   minimapCtx.strokeStyle = '#3b82f6';
   minimapCtx.lineWidth = 2;
   minimapCtx.beginPath();
   minimapCtx.moveTo(centerX, centerY);
   minimapCtx.lineTo(centerX + dirX, centerY + dirZ);
+  minimapCtx.stroke();
+  
+  // 绘制视野范围
+  minimapCtx.strokeStyle = 'rgba(59,130,246,0.2)';
+  minimapCtx.lineWidth = 1;
+  minimapCtx.beginPath();
+  minimapCtx.arc(centerX, centerY, 50, 0, Math.PI * 2);
   minimapCtx.stroke();
 }
 
