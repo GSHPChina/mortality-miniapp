@@ -6,7 +6,7 @@
 <title>末日生存：死亡倒计时 - 3A游戏原型</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { background: #000; overflow: hidden; font-family: 'Segoe UI', sans-serif; }
+body { background: #000; overflow: hidden; font-family: 'Segoe UI', sans-serif; cursor: none; }
 canvas { display: block; }
 #gameUI {
   position: fixed;
@@ -145,6 +145,7 @@ canvas { display: block; }
   align-items: center;
   justify-content: center;
   z-index: 100;
+  cursor: default;
 }
 #startScreen h1 {
   font-size: 64px;
@@ -202,6 +203,7 @@ canvas { display: block; }
   align-items: center;
   justify-content: center;
   z-index: 100;
+  cursor: default;
 }
 #gameOver h1 {
   font-size: 72px;
@@ -380,38 +382,106 @@ let items = [];
 let particles = [];
 let buildings = [];
 let trees = [];
+let bloodStains = [];
+let explosionEffects = [];
 
 function initWorld() {
   buildings = [];
   trees = [];
   enemies = [];
   items = [];
+  bloodStains = [];
+  explosionEffects = [];
   
-  for (let i = 0; i < 30; i++) {
-    buildings.push({
-      x: (Math.random() - 0.5) * WORLD_SIZE,
-      z: (Math.random() - 0.5) * WORLD_SIZE,
-      w: 20 + Math.random() * 40,
-      h: 30 + Math.random() * 50,
-      d: 20 + Math.random() * 40,
-      color: `hsl(${200 + Math.random() * 20}, ${20 + Math.random() * 10}%, ${30 + Math.random() * 20}%)`
-    });
+  // 创建更多样化的建筑
+  for (let i = 0; i < 40; i++) {
+    const type = Math.random();
+    let building;
+    if (type < 0.3) {
+      // 废墟
+      building = {
+        x: (Math.random() - 0.5) * WORLD_SIZE,
+        z: (Math.random() - 0.5) * WORLD_SIZE,
+        w: 15 + Math.random() * 25,
+        h: 10 + Math.random() * 20,
+        d: 15 + Math.random() * 25,
+        color: `hsl(${20 + Math.random() * 10}, ${30 + Math.random() * 20}%, ${25 + Math.random() * 15}%)`,
+        type: 'ruin',
+        damage: Math.random() * 0.5
+      };
+    } else if (type < 0.6) {
+      // 工厂
+      building = {
+        x: (Math.random() - 0.5) * WORLD_SIZE,
+        z: (Math.random() - 0.5) * WORLD_SIZE,
+        w: 30 + Math.random() * 40,
+        h: 20 + Math.random() * 30,
+        d: 30 + Math.random() * 40,
+        color: `hsl(${210 + Math.random() * 20}, ${15 + Math.random() * 10}%, ${30 + Math.random() * 15}%)`,
+        type: 'factory',
+        hasSmoke: Math.random() > 0.5
+      };
+    } else {
+      // 普通建筑
+      building = {
+        x: (Math.random() - 0.5) * WORLD_SIZE,
+        z: (Math.random() - 0.5) * WORLD_SIZE,
+        w: 20 + Math.random() * 30,
+        h: 25 + Math.random() * 40,
+        d: 20 + Math.random() * 30,
+        color: `hsl(${200 + Math.random() * 20}, ${20 + Math.random() * 10}%, ${35 + Math.random() * 20}%)`,
+        type: 'building',
+        windows: Math.floor(Math.random() * 4) + 1
+      };
+    }
+    buildings.push(building);
   }
   
-  for (let i = 0; i < 100; i++) {
-    trees.push({
-      x: (Math.random() - 0.5) * WORLD_SIZE,
-      z: (Math.random() - 0.5) * WORLD_SIZE,
-      h: 15 + Math.random() * 20,
-      r: 3 + Math.random() * 4
-    });
+  // 创建更多样化的树木
+  for (let i = 0; i < 150; i++) {
+    const treeType = Math.random();
+    let tree;
+    if (treeType < 0.6) {
+      // 普通树
+      tree = {
+        x: (Math.random() - 0.5) * WORLD_SIZE,
+        z: (Math.random() - 0.5) * WORLD_SIZE,
+        h: 15 + Math.random() * 20,
+        r: 3 + Math.random() * 4,
+        type: 'normal',
+        color: `hsl(${100 + Math.random() * 40}, ${50 + Math.random() * 30}%, ${25 + Math.random() * 20}%)`
+      };
+    } else if (treeType < 0.8) {
+      // 枯树
+      tree = {
+        x: (Math.random() - 0.5) * WORLD_SIZE,
+        z: (Math.random() - 0.5) * WORLD_SIZE,
+        h: 10 + Math.random() * 15,
+        r: 2 + Math.random() * 3,
+        type: 'dead',
+        color: `hsl(${30 + Math.random() * 20}, ${20 + Math.random() * 10}%, ${30 + Math.random() * 15}%)`
+      };
+    } else {
+      // 灌木
+      tree = {
+        x: (Math.random() - 0.5) * WORLD_SIZE,
+        z: (Math.random() - 0.5) * WORLD_SIZE,
+        h: 3 + Math.random() * 5,
+        r: 4 + Math.random() * 6,
+        type: 'bush',
+        color: `hsl(${80 + Math.random() * 40}, ${40 + Math.random() * 30}%, ${30 + Math.random() * 20}%)`
+      };
+    }
+    trees.push(tree);
   }
   
-  for (let i = 0; i < 20; i++) {
+  // 创建敌人
+  for (let i = 0; i < 25; i++) {
     spawnEnemy();
   }
   
-  for (let i = 0; i < 30; i++) {
+  // 创建物品
+  for (let i = 0; i < 40; i++) {
     spawnItem();
   }
 }
@@ -419,29 +489,72 @@ function initWorld() {
 function spawnEnemy() {
   const angle = Math.random() * Math.PI * 2;
   const dist = 50 + Math.random() * 100;
-  enemies.push({
-    x: player.x + Math.cos(angle) * dist,
-    y: 0,
-    z: player.z + Math.sin(angle) * dist,
-    health: 30 + Math.random() * 70,
-    maxHealth: 100,
-    speed: 0.03 + Math.random() * 0.05,
-    damage: 5 + Math.random() * 15,
-    type: Math.random() > 0.7 ? 'elite' : 'normal',
-    lastAttack: 0,
-    size: 8
-  });
+  const type = Math.random();
+  let enemy;
+  
+  if (type < 0.6) {
+    // 普通僵尸
+    enemy = {
+      x: player.x + Math.cos(angle) * dist,
+      y: 0,
+      z: player.z + Math.sin(angle) * dist,
+      health: 30 + Math.random() * 40,
+      maxHealth: 70,
+      speed: 0.03 + Math.random() * 0.04,
+      damage: 5 + Math.random() * 10,
+      type: 'zombie',
+      lastAttack: 0,
+      size: 8,
+      color: '#8b0000',
+      animation: Math.random() * Math.PI * 2
+    };
+  } else if (type < 0.85) {
+    // 变异体
+    enemy = {
+      x: player.x + Math.cos(angle) * dist,
+      y: 0,
+      z: player.z + Math.sin(angle) * dist,
+      health: 60 + Math.random() * 40,
+      maxHealth: 100,
+      speed: 0.04 + Math.random() * 0.06,
+      damage: 10 + Math.random() * 15,
+      type: 'mutant',
+      lastAttack: 0,
+      size: 10,
+      color: '#4a0080',
+      animation: Math.random() * Math.PI * 2
+    };
+  } else {
+    // 精英怪
+    enemy = {
+      x: player.x + Math.cos(angle) * dist,
+      y: 0,
+      z: player.z + Math.sin(angle) * dist,
+      health: 100 + Math.random() * 100,
+      maxHealth: 200,
+      speed: 0.05 + Math.random() * 0.08,
+      damage: 15 + Math.random() * 25,
+      type: 'elite',
+      lastAttack: 0,
+      size: 14,
+      color: '#ff4500',
+      animation: Math.random() * Math.PI * 2,
+      hasShield: Math.random() > 0.5
+    };
+  }
+  enemies.push(enemy);
 }
 
 function spawnItem() {
-  const types = ['health', 'ammo', 'food', 'energy'];
+  const types = ['health', 'ammo', 'food', 'energy', 'weapon', 'armor'];
   const type = types[Math.floor(Math.random() * types.length)];
   items.push({
     x: (Math.random() - 0.5) * WORLD_SIZE * 0.8,
     y: 0,
     z: (Math.random() - 0.5) * WORLD_SIZE * 0.8,
     type: type,
-    collected: false
+    collected: false,
+    glow: Math.random() * Math.PI * 2
   });
 }
 
@@ -500,10 +613,13 @@ function update(deltaTime) {
     player.vy = player.jumpForce;
   }
   
+  // 更新敌人
   enemies.forEach(enemy => {
     const dx = player.x - enemy.x;
     const dz = player.z - enemy.z;
     const dist = Math.sqrt(dx * dx + dz * dz);
+    
+    enemy.animation += 0.05;
     
     if (dist > 2) {
       enemy.x += (dx / dist) * enemy.speed;
@@ -514,7 +630,8 @@ function update(deltaTime) {
         player.health -= enemy.damage;
         enemy.lastAttack = now;
         showMessage(`受到攻击！-${enemy.damage.toFixed(0)}生命`);
-        createParticles(player.x, player.y + 10, player.z, '#ef4444', 5);
+        createParticles(player.x, player.y + 10, player.z, '#ef4444', 8);
+        createBloodStain(player.x, player.z);
       }
     }
     
@@ -525,21 +642,49 @@ function update(deltaTime) {
     }
   });
   
+  // 射击
   if (mouseDown && Date.now() - lastShot > 300) {
     shoot();
     lastShot = Date.now();
   }
   
+  // 物品收集
   items.forEach(item => {
     if (item.collected) return;
     const dx = player.x - item.x;
     const dz = player.z - item.z;
     const dist = Math.sqrt(dx * dx + dz * dz);
     
+    item.glow += 0.05;
+    
     if (dist < 3 && keys['e']) {
       item.collected = true;
       collectItem(item);
     }
+  });
+  
+  // 更新粒子
+  particles = particles.filter(p => p.life > 0);
+  particles.forEach(p => {
+    p.x += p.vx;
+    p.y += p.vy;
+    p.z += p.vz;
+    p.vy -= 0.01;
+    p.life -= 0.02;
+    p.size *= 0.98;
+  });
+  
+  // 更新血迹
+  bloodStains = bloodStains.filter(b => b.life > 0);
+  bloodStains.forEach(b => {
+    b.life -= 0.001;
+  });
+  
+  // 更新爆炸效果
+  explosionEffects = explosionEffects.filter(e => e.life > 0);
+  explosionEffects.forEach(e => {
+    e.radius += 0.5;
+    e.life -= 0.03;
   });
   
   player.health = Math.max(0, Math.min(100, player.health - 0.01));
@@ -551,23 +696,17 @@ function update(deltaTime) {
   
   score += deltaTime / 1000;
   
-  particles = particles.filter(p => p.life > 0);
-  particles.forEach(p => {
-    p.x += p.vx;
-    p.y += p.vy;
-    p.z += p.vz;
-    p.vy -= 0.01;
-    p.life -= 0.02;
-  });
-  
-  if (enemies.length < 15) spawnEnemy();
-  if (items.filter(i => !i.collected).length < 10) spawnItem();
+  if (enemies.length < 20) spawnEnemy();
+  if (items.filter(i => !i.collected).length < 15) spawnItem();
 }
 
 function shoot() {
   const item = player.inventory[player.selectedSlot];
   if (item.name === '手枪' && item.ammo > 0) {
     item.ammo--;
+    
+    // 创建枪口闪光
+    createMuzzleFlash();
     
     for (let i = 0; i < enemies.length; i++) {
       const enemy = enemies[i];
@@ -586,9 +725,11 @@ function shoot() {
       
       if (dot > 0.95 && dist < 80) {
         enemy.health -= 25;
-        createParticles(enemy.x, enemy.y + 10, enemy.z, '#ef4444', 8);
+        createParticles(enemy.x, enemy.y + 10, enemy.z, '#ef4444', 12);
+        createBloodStain(enemy.x, enemy.z);
         
         if (enemy.health <= 0) {
+          createExplosion(enemy.x, enemy.y + 10, enemy.z);
           enemies.splice(i, 1);
           kills++;
           score += 100;
@@ -598,6 +739,55 @@ function shoot() {
         break;
       }
     }
+  }
+}
+
+function createMuzzleFlash() {
+  for (let i = 0; i < 5; i++) {
+    particles.push({
+      x: player.x + Math.sin(player.yaw) * 5,
+      y: player.y + 10,
+      z: player.z + Math.cos(player.yaw) * 5,
+      vx: Math.sin(player.yaw) * 0.5 + (Math.random() - 0.5) * 0.3,
+      vy: 0.1 + Math.random() * 0.2,
+      vz: Math.cos(player.yaw) * 0.5 + (Math.random() - 0.5) * 0.3,
+      color: '#ffff00',
+      life: 0.3,
+      size: 3
+    });
+  }
+}
+
+function createBloodStain(x, z) {
+  bloodStains.push({
+    x: x,
+    z: z,
+    size: 2 + Math.random() * 3,
+    life: 1
+  });
+}
+
+function createExplosion(x, y, z) {
+  explosionEffects.push({
+    x: x,
+    y: y,
+    z: z,
+    radius: 5,
+    life: 1
+  });
+  
+  for (let i = 0; i < 20; i++) {
+    particles.push({
+      x: x,
+      y: y,
+      z: z,
+      vx: (Math.random() - 0.5) * 1,
+      vy: Math.random() * 0.5,
+      vz: (Math.random() - 0.5) * 1,
+      color: Math.random() > 0.5 ? '#ff4500' : '#ff8c00',
+      life: 1,
+      size: 4 + Math.random() * 4
+    });
   }
 }
 
@@ -619,8 +809,18 @@ function collectItem(item) {
       player.stamina = Math.min(100, player.stamina + 30);
       showMessage('+30 体力');
       break;
+    case 'weapon':
+      player.inventory[0].maxAmmo += 6;
+      showMessage('+6 最大弹药');
+      break;
+    case 'armor':
+      player.health = Math.min(100, player.health + 10);
+      player.survival = Math.min(100, player.survival + 10);
+      showMessage('+10 生命/生存');
+      break;
   }
   score += 50;
+  createParticles(item.x, item.y + 5, item.z, '#22c55e', 10);
 }
 
 function createParticles(x, y, z, color, count) {
@@ -631,7 +831,8 @@ function createParticles(x, y, z, color, count) {
       vy: Math.random() * 0.3,
       vz: (Math.random() - 0.5) * 0.5,
       color: color,
-      life: 1
+      life: 1,
+      size: 2 + Math.random() * 3
     });
   }
 }
@@ -644,38 +845,90 @@ function showMessage(text) {
 }
 
 function render() {
+  // 清除画布
   ctx.fillStyle = '#1a1a2e';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   
-  const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  // 绘制天空
+  const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height * 0.6);
   gradient.addColorStop(0, '#0f0f23');
-  gradient.addColorStop(0.5, '#1a1a2e');
-  gradient.addColorStop(1, '#16213e');
+  gradient.addColorStop(0.3, '#1a1a2e');
+  gradient.addColorStop(0.6, '#2d1b4e');
+  gradient.addColorStop(1, '#4a1942');
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   
+  // 绘制月亮
+  ctx.fillStyle = '#e2e8f0';
+  ctx.shadowColor = '#e2e8f0';
+  ctx.shadowBlur = 30;
+  ctx.beginPath();
+  ctx.arc(canvas.width * 0.8, canvas.height * 0.15, 40, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+  
+  // 绘制星星
   ctx.fillStyle = '#ffffff';
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 200; i++) {
     const sx = (Math.sin(i * 132.1) * 0.5 + 0.5) * canvas.width;
-    const sy = (Math.cos(i * 73.7) * 0.5 + 0.5) * canvas.height * 0.5;
+    const sy = (Math.cos(i * 73.7) * 0.5 + 0.5) * canvas.height * 0.4;
     const size = Math.sin(Date.now() / 1000 + i) * 0.5 + 1;
-    ctx.globalAlpha = 0.5 + Math.sin(Date.now() / 2000 + i) * 0.3;
+    ctx.globalAlpha = 0.3 + Math.sin(Date.now() / 2000 + i) * 0.3;
     ctx.fillRect(sx, sy, size, size);
   }
   ctx.globalAlpha = 1;
   
-  ctx.fillStyle = '#0d1117';
+  // 绘制地面
+  const groundGradient = ctx.createLinearGradient(0, canvas.height * 0.6, 0, canvas.height);
+  groundGradient.addColorStop(0, '#1a1a0a');
+  groundGradient.addColorStop(0.3, '#0d1117');
+  groundGradient.addColorStop(1, '#0a0a0a');
+  ctx.fillStyle = groundGradient;
   ctx.fillRect(0, canvas.height * 0.6, canvas.width, canvas.height * 0.4);
   
-  const objects3D = [];
+  // 绘制地面纹理
+  ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+  ctx.lineWidth = 1;
+  for (let i = 0; i < 20; i++) {
+    const y = canvas.height * 0.6 + i * 10;
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(canvas.width, y);
+    ctx.stroke();
+  }
   
-  buildings.forEach(b => {
+  // 绘制血迹
+  bloodStains.forEach(b => {
     const relX = b.x - player.x;
     const relZ = b.z - player.z;
     const rotX = relX * Math.cos(player.yaw) - relZ * Math.sin(player.yaw);
     const rotZ = relX * Math.sin(player.yaw) + relZ * Math.cos(player.yaw);
     
     if (rotZ > 0.1) {
+      const scale = 200 / rotZ;
+      const screenX = canvas.width / 2 + rotX * scale;
+      const screenY = canvas.height * 0.6;
+      
+      ctx.globalAlpha = b.life * 0.6;
+      ctx.fillStyle = '#8b0000';
+      ctx.beginPath();
+      ctx.ellipse(screenX, screenY, b.size * scale, b.size * scale * 0.3, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+  });
+  
+  // 收集3D对象
+  const objects3D = [];
+  
+  // 建筑
+  buildings.forEach(b => {
+    const relX = b.x - player.x;
+    const relZ = b.z - player.z;
+    const rotX = relX * Math.cos(player.yaw) - relZ * Math.sin(player.yaw);
+    const rotZ = relX * Math.sin(player.yaw) + relZ * Math.cos(player.yaw);
+    
+    if (rotZ > 0.1 && rotZ < 200) {
       const scale = 200 / rotZ;
       const screenX = canvas.width / 2 + rotX * scale;
       const screenY = canvas.height * 0.6 - b.h * scale / 2;
@@ -687,18 +940,23 @@ function render() {
         w: b.w * scale,
         h: b.h * scale,
         d: rotZ,
-        color: b.color
+        color: b.color,
+        buildingType: b.type,
+        hasSmoke: b.hasSmoke,
+        windows: b.windows,
+        damage: b.damage
       });
     }
   });
   
+  // 树木
   trees.forEach(t => {
     const relX = t.x - player.x;
     const relZ = t.z - player.z;
     const rotX = relX * Math.cos(player.yaw) - relZ * Math.sin(player.yaw);
     const rotZ = relX * Math.sin(player.yaw) + relZ * Math.cos(player.yaw);
     
-    if (rotZ > 0.1) {
+    if (rotZ > 0.1 && rotZ < 150) {
       const scale = 200 / rotZ;
       const screenX = canvas.width / 2 + rotX * scale;
       const screenY = canvas.height * 0.6;
@@ -709,18 +967,21 @@ function render() {
         y: screenY,
         h: t.h * scale,
         r: t.r * scale,
-        d: rotZ
+        d: rotZ,
+        treeType: t.type,
+        color: t.color
       });
     }
   });
   
+  // 敌人
   enemies.forEach(e => {
     const relX = e.x - player.x;
     const relZ = e.z - player.z;
     const rotX = relX * Math.cos(player.yaw) - relZ * Math.sin(player.yaw);
     const rotZ = relX * Math.sin(player.yaw) + relZ * Math.cos(player.yaw);
     
-    if (rotZ > 0.1) {
+    if (rotZ > 0.1 && rotZ < 150) {
       const scale = 200 / rotZ;
       const screenX = canvas.width / 2 + rotX * scale;
       const screenY = canvas.height * 0.6 - 10 * scale;
@@ -733,11 +994,15 @@ function render() {
         d: rotZ,
         health: e.health,
         maxHealth: e.maxHealth,
-        isElite: e.type === 'elite'
+        enemyType: e.type,
+        color: e.color,
+        animation: e.animation,
+        hasShield: e.hasShield
       });
     }
   });
   
+  // 物品
   items.forEach(item => {
     if (item.collected) return;
     const relX = item.x - player.x;
@@ -745,7 +1010,7 @@ function render() {
     const rotX = relX * Math.cos(player.yaw) - relZ * Math.sin(player.yaw);
     const rotZ = relX * Math.sin(player.yaw) + relZ * Math.cos(player.yaw);
     
-    if (rotZ > 0.1) {
+    if (rotZ > 0.1 && rotZ < 100) {
       const scale = 200 / rotZ;
       const screenX = canvas.width / 2 + rotX * scale;
       const screenY = canvas.height * 0.6 - 3 * scale;
@@ -756,46 +1021,35 @@ function render() {
         y: screenY,
         size: 3 * scale,
         d: rotZ,
-        itemType: item.type
+        itemType: item.type,
+        glow: item.glow
       });
     }
   });
   
-  objects3D.sort((a, b) => b.d - a.d);
-  
-  objects3D.forEach(obj => {
-    if (obj.type === 'building') {
-      ctx.fillStyle = obj.color;
-      ctx.fillRect(obj.x - obj.w/2, obj.y, obj.w, obj.h);
-      ctx.strokeStyle = 'rgba(0,0,0,0.3)';
-      ctx.strokeRect(obj.x - obj.w/2, obj.y, obj.w, obj.h);
-    } else if (obj.type === 'tree') {
-      ctx.fillStyle = '#2d1b00';
-      ctx.fillRect(obj.x - 2, obj.y - obj.h * 0.3, 4, obj.h * 0.3);
-      ctx.fillStyle = '#1a5c1a';
+  // 爆炸效果
+  explosionEffects.forEach(e => {
+    const relX = e.x - player.x;
+    const relZ = e.z - player.z;
+    const rotX = relX * Math.cos(player.yaw) - relZ * Math.sin(player.yaw);
+    const rotZ = relX * Math.sin(player.yaw) + relZ * Math.cos(player.yaw);
+    
+    if (rotZ > 0.1) {
+      const scale = 200 / rotZ;
+      const screenX = canvas.width / 2 + rotX * scale;
+      const screenY = canvas.height * 0.6 - e.y * scale;
+      
+      ctx.globalAlpha = e.life;
+      ctx.strokeStyle = '#ff4500';
+      ctx.lineWidth = 3;
       ctx.beginPath();
-      ctx.arc(obj.x, obj.y - obj.h * 0.5, obj.r, 0, Math.PI * 2);
-      ctx.fill();
-    } else if (obj.type === 'enemy') {
-      ctx.fillStyle = obj.isElite ? '#7c3aed' : '#dc2626';
-      ctx.fillRect(obj.x - obj.size/2, obj.y - obj.size, obj.size, obj.size);
-      ctx.fillStyle = '#000';
-      ctx.fillRect(obj.x - obj.size/2, obj.y - obj.size - 8, obj.size, 4);
-      ctx.fillStyle = '#22c55e';
-      const healthWidth = (obj.health / obj.maxHealth) * obj.size;
-      ctx.fillRect(obj.x - obj.size/2, obj.y - obj.size - 8, healthWidth, 4);
-    } else if (obj.type === 'item') {
-      const colors = {health: '#ef4444', ammo: '#f59e0b', food: '#22c55e', energy: '#3b82f6'};
-      ctx.fillStyle = colors[obj.itemType] || '#fff';
-      ctx.beginPath();
-      ctx.arc(obj.x, obj.y, obj.size, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = '#fff';
-      ctx.lineWidth = 2;
+      ctx.arc(screenX, screenY, e.radius * scale, 0, Math.PI * 2);
       ctx.stroke();
+      ctx.globalAlpha = 1;
     }
   });
   
+  // 粒子
   particles.forEach(p => {
     const relX = p.x - player.x;
     const relZ = p.z - player.z;
@@ -809,13 +1063,196 @@ function render() {
       
       ctx.globalAlpha = p.life;
       ctx.fillStyle = p.color;
-      ctx.fillRect(screenX - 2, screenY - 2, 4, 4);
+      ctx.beginPath();
+      ctx.arc(screenX, screenY, p.size * scale, 0, Math.PI * 2);
+      ctx.fill();
       ctx.globalAlpha = 1;
     }
   });
   
+  // 按距离排序并绘制
+  objects3D.sort((a, b) => b.d - a.d);
+  
+  objects3D.forEach(obj => {
+    if (obj.type === 'building') {
+      // 绘制建筑主体
+      ctx.fillStyle = obj.color;
+      ctx.fillRect(obj.x - obj.w/2, obj.y, obj.w, obj.h);
+      
+      // 绘制建筑损坏效果
+      if (obj.damage > 0) {
+        ctx.fillStyle = 'rgba(0,0,0,0.3)';
+        ctx.fillRect(obj.x - obj.w/2, obj.y, obj.w * obj.damage, obj.h * 0.3);
+      }
+      
+      // 绘制窗户
+      if (obj.windows) {
+        ctx.fillStyle = 'rgba(255,255,200,0.3)';
+        const windowSize = Math.min(obj.w, obj.h) * 0.15;
+        for (let i = 0; i < obj.windows; i++) {
+          const wx = obj.x - obj.w/2 + (i + 1) * obj.w / (obj.windows + 1) - windowSize/2;
+          const wy = obj.y + obj.h * 0.3;
+          ctx.fillRect(wx, wy, windowSize, windowSize);
+        }
+      }
+      
+      // 绘制烟雾效果
+      if (obj.hasSmoke) {
+        ctx.fillStyle = 'rgba(100,100,100,0.3)';
+        for (let i = 0; i < 3; i++) {
+          const sx = obj.x + Math.sin(Date.now() / 500 + i) * 10;
+          const sy = obj.y - 20 - i * 15;
+          ctx.beginPath();
+          ctx.arc(sx, sy, 8 + i * 3, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      
+      // 绘制建筑边框
+      ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(obj.x - obj.w/2, obj.y, obj.w, obj.h);
+      
+    } else if (obj.type === 'tree') {
+      if (obj.treeType === 'normal') {
+        // 普通树
+        ctx.fillStyle = '#2d1b00';
+        ctx.fillRect(obj.x - 2, obj.y - obj.h * 0.3, 4, obj.h * 0.3);
+        ctx.fillStyle = obj.color;
+        ctx.beginPath();
+        ctx.arc(obj.x, obj.y - obj.h * 0.5, obj.r, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (obj.treeType === 'dead') {
+        // 枯树
+        ctx.strokeStyle = obj.color;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(obj.x, obj.y);
+        ctx.lineTo(obj.x, obj.y - obj.h);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(obj.x, obj.y - obj.h * 0.7);
+        ctx.lineTo(obj.x - obj.r, obj.y - obj.h * 0.9);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(obj.x, obj.y - obj.h * 0.5);
+        ctx.lineTo(obj.x + obj.r, obj.y - obj.h * 0.8);
+        ctx.stroke();
+      } else {
+        // 灌木
+        ctx.fillStyle = obj.color;
+        ctx.beginPath();
+        ctx.arc(obj.x, obj.y - obj.h/2, obj.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      
+    } else if (obj.type === 'enemy') {
+      // 绘制敌人身体
+      ctx.fillStyle = obj.color;
+      const bodyWidth = obj.size * 0.8;
+      const bodyHeight = obj.size * 1.2;
+      
+      // 身体
+      ctx.fillRect(obj.x - bodyWidth/2, obj.y - bodyHeight, bodyWidth, bodyHeight);
+      
+      // 头部
+      ctx.beginPath();
+      ctx.arc(obj.x, obj.y - bodyHeight - obj.size * 0.3, obj.size * 0.35, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // 眼睛
+      ctx.fillStyle = '#ff0000';
+      ctx.beginPath();
+      ctx.arc(obj.x - obj.size * 0.15, obj.y - bodyHeight - obj.size * 0.35, obj.size * 0.08, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(obj.x + obj.size * 0.15, obj.y - bodyHeight - obj.size * 0.35, obj.size * 0.08, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // 护盾效果
+      if (obj.hasShield) {
+        ctx.strokeStyle = 'rgba(100,200,255,0.5)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(obj.x, obj.y - bodyHeight/2, obj.size * 0.8, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      
+      // 血条
+      ctx.fillStyle = '#000';
+      ctx.fillRect(obj.x - obj.size/2, obj.y - obj.size - 12, obj.size, 6);
+      ctx.fillStyle = obj.health > obj.maxHealth * 0.3 ? '#22c55e' : '#ef4444';
+      const healthWidth = (obj.health / obj.maxHealth) * obj.size;
+      ctx.fillRect(obj.x - obj.size/2, obj.y - obj.size - 12, healthWidth, 6);
+      
+      // 动画效果
+      const wobble = Math.sin(obj.animation) * 2;
+      ctx.fillStyle = obj.color;
+      ctx.fillRect(obj.x - bodyWidth/2 + wobble, obj.y - bodyHeight, bodyWidth, bodyHeight);
+      
+    } else if (obj.type === 'item') {
+      // 绘制物品发光效果
+      const glowIntensity = Math.sin(obj.glow) * 0.3 + 0.7;
+      ctx.shadowColor = getItemColor(obj.itemType);
+      ctx.shadowBlur = 10 * glowIntensity;
+      
+      ctx.fillStyle = getItemColor(obj.itemType);
+      ctx.beginPath();
+      ctx.arc(obj.x, obj.y, obj.size * glowIntensity, 0, Math.PI * 2);
+      ctx.fill();
+      
+      ctx.shadowBlur = 0;
+      
+      // 绘制物品图标
+      ctx.fillStyle = '#fff';
+      ctx.font = `${obj.size * 1.5}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(getItemIcon(obj.itemType), obj.x, obj.y);
+    }
+  });
+  
+  // 绘制伤害效果
+  if (player.health < 30) {
+    ctx.fillStyle = `rgba(255,0,0,${0.2 + Math.sin(Date.now() / 200) * 0.1})`;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+  
+  // 绘制冲刺效果
+  if (player.isSprinting) {
+    ctx.fillStyle = 'rgba(255,255,255,0.05)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+  
+  // 绘制小地图
   renderMinimap();
+  
+  // 更新UI
   updateUI();
+}
+
+function getItemColor(type) {
+  const colors = {
+    health: '#ef4444',
+    ammo: '#f59e0b',
+    food: '#22c55e',
+    energy: '#3b82f6',
+    weapon: '#8b5cf6',
+    armor: '#06b6d4'
+  };
+  return colors[type] || '#fff';
+}
+
+function getItemIcon(type) {
+  const icons = {
+    health: '❤️',
+    ammo: '🔫',
+    food: '🍖',
+    energy: '⚡',
+    weapon: '⚔️',
+    armor: '🛡️'
+  };
+  return icons[type] || '❓';
 }
 
 function renderMinimap() {
@@ -826,6 +1263,7 @@ function renderMinimap() {
   const centerX = 90;
   const centerY = 90;
   
+  // 绘制建筑
   buildings.forEach(b => {
     const rx = (b.x - player.x) * scale + centerX;
     const rz = (b.z - player.z) * scale + centerY;
@@ -835,6 +1273,7 @@ function renderMinimap() {
     }
   });
   
+  // 绘制敌人
   enemies.forEach(e => {
     const rx = (e.x - player.x) * scale + centerX;
     const rz = (e.z - player.z) * scale + centerY;
@@ -846,6 +1285,7 @@ function renderMinimap() {
     }
   });
   
+  // 绘制物品
   items.forEach(item => {
     if (item.collected) return;
     const rx = (item.x - player.x) * scale + centerX;
@@ -858,11 +1298,13 @@ function renderMinimap() {
     }
   });
   
+  // 绘制玩家
   minimapCtx.fillStyle = '#3b82f6';
   minimapCtx.beginPath();
   minimapCtx.arc(centerX, centerY, 4, 0, Math.PI * 2);
   minimapCtx.fill();
   
+  // 绘制方向
   const dirX = Math.sin(player.yaw) * 10;
   const dirZ = Math.cos(player.yaw) * 10;
   minimapCtx.strokeStyle = '#3b82f6';
@@ -907,6 +1349,7 @@ function gameOver(reason) {
     击杀敌人：${kills}<br>
     最终评分：${Math.round(score * 10 + kills * 100)}
   `;
+  document.body.style.cursor = 'default';
 }
 
 function startGame() {
@@ -921,6 +1364,7 @@ function startGame() {
   player.health = 100;
   player.stamina = 100;
   player.survival = 100;
+  document.body.style.cursor = 'none';
   initWorld();
   gameLoop();
 }
