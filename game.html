@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>西游记：九九八十一难</title>
+<title>西游记：九九八十一难 - 恐怖版</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { background: #000; overflow: hidden; font-family: 'STKaiti', 'KaiTi', serif; cursor: none; }
@@ -13,55 +13,65 @@ canvas { display: block; }
 .hud-item { margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
 .hud-bar { width: 150px; height: 12px; background: rgba(0,0,0,0.5); border-radius: 6px; overflow: hidden; border: 1px solid rgba(255,255,255,0.2); }
 .hud-bar-fill { height: 100%; border-radius: 6px; transition: width 0.3s; }
-.health-fill { background: linear-gradient(90deg, #ef4444, #dc2626); }
-.mana-fill { background: linear-gradient(90deg, #3b82f6, #2563eb); }
+.health-fill { background: linear-gradient(90deg, #dc2626, #991b1b); }
+.mana-fill { background: linear-gradient(90deg, #7c3aed, #5b21b6); }
 .exp-fill { background: linear-gradient(90deg, #f59e0b, #d97706); }
-#levelInfo { position: fixed; top: 20px; right: 20px; color: #f59e0b; font-size: 18px; text-shadow: 0 0 10px rgba(245,158,11,0.8); text-align: right; }
+#levelInfo { position: fixed; top: 20px; right: 20px; color: #dc2626; font-size: 18px; text-shadow: 0 0 10px rgba(220,38,38,0.8); text-align: right; }
 #levelTitle { font-size: 28px; font-weight: bold; margin-bottom: 5px; }
-#levelDesc { font-size: 14px; color: #d97706; }
+#levelDesc { font-size: 14px; color: #991b1b; }
 #progressBar { position: fixed; top: 80px; right: 20px; width: 200px; }
 .progress-track { width: 100%; height: 8px; background: rgba(0,0,0,0.5); border-radius: 4px; overflow: hidden; }
-.progress-fill { height: 100%; background: linear-gradient(90deg, #f59e0b, #22c55e); border-radius: 4px; transition: width 0.3s; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, #dc2626, #991b1b); border-radius: 4px; transition: width 0.3s; }
 .progress-text { font-size: 12px; color: #94a3b8; margin-top: 4px; text-align: center; }
 #skillBar { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; }
-.skill-slot { width: 60px; height: 60px; background: rgba(0,0,0,0.7); border: 2px solid rgba(255,255,255,0.2); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
-.skill-slot:hover { border-color: #f59e0b; }
-.skill-slot.active { border-color: #ef4444; background: rgba(239,68,68,0.3); }
+.skill-slot { width: 60px; height: 60px; background: rgba(0,0,0,0.8); border: 2px solid rgba(220,38,38,0.3); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
+.skill-slot:hover { border-color: #dc2626; }
+.skill-slot.active { border-color: #dc2626; background: rgba(220,38,38,0.3); }
 .skill-icon { font-size: 24px; }
 .skill-key { font-size: 10px; color: #94a3b8; }
-.skill-cd { font-size: 10px; color: #ef4444; }
 #inventory { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 4px; }
-.inv-slot { width: 50px; height: 50px; background: rgba(0,0,0,0.7); border: 2px solid rgba(255,255,255,0.2); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; transition: all 0.2s; }
-.inv-slot:hover { border-color: #f59e0b; }
-.inv-slot.active { border-color: #ef4444; background: rgba(239,68,68,0.3); }
-#crosshair { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.5); border-radius: 50%; pointer-events: none; }
-#crosshair::before, #crosshair::after { content: ''; position: absolute; background: rgba(255,255,255,0.5); }
+.inv-slot { width: 50px; height: 50px; background: rgba(0,0,0,0.8); border: 2px solid rgba(220,38,38,0.3); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+.inv-slot.active { border-color: #dc2626; background: rgba(220,38,38,0.3); }
+#crosshair { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 20px; height: 20px; border: 2px solid rgba(220,38,38,0.5); border-radius: 50%; pointer-events: none; }
+#crosshair::before, #crosshair::after { content: ''; position: absolute; background: rgba(220,38,38,0.5); }
 #crosshair::before { width: 2px; height: 8px; top: 50%; left: 50%; transform: translate(-50%, -50%); }
 #crosshair::after { width: 8px; height: 2px; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-#startScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #1a0a0a, #2d1b1b); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; cursor: default; }
-#startScreen h1 { font-size: 80px; color: #f59e0b; text-shadow: 0 0 40px rgba(245,158,11,0.5); margin-bottom: 10px; }
-#startScreen h2 { font-size: 32px; color: #d97706; margin-bottom: 40px; font-weight: 300; }
-#startBtn { padding: 16px 48px; font-size: 20px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; letter-spacing: 4px; transition: all 0.3s; box-shadow: 0 4px 20px rgba(245,158,11,0.4); }
-#startBtn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(245,158,11,0.6); }
-.controls-info { margin-top: 40px; color: #94a3b8; font-size: 14px; text-align: center; line-height: 2; }
-.controls-info span { background: rgba(255,255,255,0.1); padding: 4px 12px; border-radius: 4px; margin: 0 4px; }
-#gameOver { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 100; cursor: default; }
-#gameOver h1 { font-size: 72px; color: #ef4444; margin-bottom: 20px; }
+#startScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; cursor: default; }
+#startScreen h1 { font-size: 80px; color: #dc2626; text-shadow: 0 0 40px rgba(220,38,38,0.8), 0 0 80px rgba(220,38,38,0.4); margin-bottom: 10px; animation: flicker 3s infinite; }
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+  52% { opacity: 1; }
+  54% { opacity: 0.6; }
+  56% { opacity: 1; }
+}
+#startScreen h2 { font-size: 32px; color: #991b1b; margin-bottom: 40px; font-weight: 300; }
+#startBtn { padding: 16px 48px; font-size: 20px; background: linear-gradient(135deg, #dc2626, #991b1b); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; letter-spacing: 4px; transition: all 0.3s; box-shadow: 0 0 20px rgba(220,38,38,0.5); }
+#startBtn:hover { transform: translateY(-2px); box-shadow: 0 0 40px rgba(220,38,38,0.8); }
+.controls-info { margin-top: 40px; color: #64748b; font-size: 14px; text-align: center; line-height: 2; }
+.controls-info span { background: rgba(220,38,38,0.1); padding: 4px 12px; border-radius: 4px; margin: 0 4px; border: 1px solid rgba(220,38,38,0.3); }
+#gameOver { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 100; cursor: default; }
+#gameOver h1 { font-size: 72px; color: #dc2626; margin-bottom: 20px; text-shadow: 0 0 30px rgba(220,38,38,0.8); }
 #gameOver .stats { color: #94a3b8; font-size: 18px; margin-bottom: 30px; text-align: center; line-height: 2; }
-#restartBtn { padding: 16px 48px; font-size: 20px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
-#levelComplete { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 100; cursor: default; }
-#levelComplete h1 { font-size: 48px; color: #f59e0b; margin-bottom: 20px; }
-#levelComplete .rewards { color: #22c55e; font-size: 20px; margin-bottom: 30px; }
-#nextLevelBtn { padding: 16px 48px; font-size: 20px; background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
-#message { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #fff; font-size: 24px; text-shadow: 0 0 10px rgba(0,0,0,0.8); opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+#restartBtn { padding: 16px 48px; font-size: 20px; background: linear-gradient(135deg, #dc2626, #991b1b); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+#levelComplete { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 100; cursor: default; }
+#levelComplete h1 { font-size: 48px; color: #dc2626; margin-bottom: 20px; text-shadow: 0 0 20px rgba(220,38,38,0.5); }
+#levelComplete .rewards { color: #f59e0b; font-size: 20px; margin-bottom: 30px; }
+#nextLevelBtn { padding: 16px 48px; font-size: 20px; background: linear-gradient(135deg, #dc2626, #991b1b); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+#message { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #dc2626; font-size: 28px; text-shadow: 0 0 20px rgba(220,38,38,0.8); opacity: 0; transition: opacity 0.3s; pointer-events: none; font-weight: bold; }
 #bossBar { position: fixed; top: 120px; left: 50%; transform: translateX(-50%); width: 400px; display: none; }
-.boss-name { color: #ef4444; font-size: 18px; text-align: center; margin-bottom: 8px; text-shadow: 0 0 10px rgba(239,68,68,0.5); }
-.boss-health-track { width: 100%; height: 16px; background: rgba(0,0,0,0.7); border-radius: 8px; overflow: hidden; border: 2px solid rgba(239,68,68,0.5); }
-.boss-health-fill { height: 100%; background: linear-gradient(90deg, #ef4444, #dc2626); border-radius: 8px; transition: width 0.3s; }
+.boss-name { color: #dc2626; font-size: 20px; text-align: center; margin-bottom: 8px; text-shadow: 0 0 15px rgba(220,38,38,0.8); }
+.boss-health-track { width: 100%; height: 16px; background: rgba(0,0,0,0.7); border-radius: 8px; overflow: hidden; border: 2px solid rgba(220,38,38,0.5); }
+.boss-health-fill { height: 100%; background: linear-gradient(90deg, #dc2626, #991b1b); border-radius: 8px; transition: width 0.3s; }
+#jumpScare { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: none; align-items: center; justify-content: center; z-index: 200; }
+#jumpScare img { max-width: 80%; max-height: 80%; }
+#bloodOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; opacity: 0; transition: opacity 0.5s; }
+#horrorText { position: fixed; bottom: 150px; left: 50%; transform: translateX(-50%); color: #dc2626; font-size: 18px; text-shadow: 0 0 10px rgba(220,38,38,0.5); opacity: 0; transition: opacity 1s; pointer-events: none; text-align: center; max-width: 400px; }
 </style>
 </head>
 <body>
 <canvas id="gameCanvas"></canvas>
+<canvas id="bloodOverlay" width="800" height="600"></canvas>
 
 <div id="gameUI">
   <div id="hud">
@@ -128,21 +138,22 @@ canvas { display: block; }
   
   <div id="crosshair"></div>
   <div id="message"></div>
+  <div id="horrorText"></div>
 </div>
 
 <div id="startScreen">
   <h1>西游记</h1>
-  <h2>九九八十一难</h2>
-  <button id="startBtn" onclick="startGame()">开始取经</button>
+  <h2>九九八十一难 · 地狱模式</h2>
+  <button id="startBtn" onclick="startGame()">踏入深渊</button>
   <div class="controls-info">
     <span>WASD</span> 移动 | <span>鼠标</span> 视角 | <span>左键</span> 攻击<br>
     <span>1-5</span> 技能 | <span>E</span> 拾取 | <span>Space</span> 跳跃<br>
-    <span>Shift</span> 筋斗云 | 消灭所有妖怪过关
+    <span>Shift</span> 筋斗云 | 警告：本游戏含有恐怖元素
   </div>
 </div>
 
 <div id="gameOver">
-  <h1>取经失败</h1>
+  <h1>你死了</h1>
   <div class="stats" id="deathStats"></div>
   <button id="restartBtn" onclick="restartGame()">重新开始</button>
 </div>
@@ -153,9 +164,13 @@ canvas { display: block; }
   <button id="nextLevelBtn" onclick="nextLevel()">前往下一难</button>
 </div>
 
+<div id="jumpScare"></div>
+
 <script>
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
+const bloodCanvas = document.getElementById('bloodOverlay');
+const bloodCtx = bloodCanvas.getContext('2d');
 
 const PIXEL_RATIO = window.devicePixelRatio || 1;
 canvas.width = window.innerWidth * PIXEL_RATIO;
@@ -172,6 +187,34 @@ let levelKills = 0;
 let levelTarget = 10;
 let levelBoss = null;
 let bossDefeated = false;
+let horrorTimer = 0;
+let jumpScareTimer = 0;
+let flickerTimer = 0;
+let bloodStains = [];
+
+// 恐怖文字
+const horrorTexts = [
+  "你听到了什么声音...",
+  "它在看着你...",
+  "不要回头...",
+  "你并不孤单...",
+  "血...到处都是血...",
+  "救救我...",
+  "它来了...",
+  "跑...快跑...",
+  "你听到了脚步声...",
+  "黑暗中有东西在动...",
+  "它在笑...",
+  "你闻到了腐烂的味道...",
+  "墙壁在流血...",
+  "它在你的身后...",
+  "不要闭眼...",
+  "你听到了尖叫声...",
+  "它在靠近...",
+  "你感到了冰冷的触感...",
+  "黑暗正在吞噬一切...",
+  "你听到了低语声..."
+];
 
 // 九九八十一难配置
 const levels = [
@@ -290,11 +333,7 @@ let enemies = [];
 let items = [];
 let particles = [];
 
-// 关卡数据
 const levelData = {
-  enemies: [],
-  items: [],
-  particles: [],
   buildings: [],
   trees: [],
   clouds: []
@@ -302,10 +341,7 @@ const levelData = {
 
 function initLevel(levelNum) {
   const levelConfig = levels[levelNum - 1];
-  if (!levelConfig) {
-    gameWin();
-    return;
-  }
+  if (!levelConfig) { gameWin(); return; }
   
   currentLevel = levelNum;
   levelKills = 0;
@@ -316,60 +352,52 @@ function initLevel(levelNum) {
   document.getElementById('levelTitle').textContent = `第${levelNum}难`;
   document.getElementById('levelDesc').textContent = levelConfig.name;
   
-  // 清空
   enemies.length = 0;
   items.length = 0;
   particles.length = 0;
   levelData.buildings.length = 0;
   levelData.trees.length = 0;
   levelData.clouds.length = 0;
+  bloodStains = [];
   
-  // 生成场景
-  for (let i = 0; i < 30; i++) {
+  // 恐怖场景
+  for (let i = 0; i < 35; i++) {
     levelData.buildings.push({
       x: (Math.random() - 0.5) * WORLD_SIZE,
       z: (Math.random() - 0.5) * WORLD_SIZE,
       w: 20 + Math.random() * 40,
       h: 30 + Math.random() * 50,
-      color: `hsl(${30 + Math.random() * 20}, ${50 + Math.random() * 20}%, ${40 + Math.random() * 20}%)`
+      color: `hsl(0, ${10 + Math.random() * 20}%, ${15 + Math.random() * 15}%)`,
+      damaged: Math.random() > 0.5
     });
   }
   
-  for (let i = 0; i < 80; i++) {
+  for (let i = 0; i < 100; i++) {
     levelData.trees.push({
       x: (Math.random() - 0.5) * WORLD_SIZE,
       z: (Math.random() - 0.5) * WORLD_SIZE,
       h: 15 + Math.random() * 25,
       r: 4 + Math.random() * 6,
-      color: `hsl(${100 + Math.random() * 40}, ${50 + Math.random() * 30}%, ${30 + Math.random() * 20}%)`
+      color: `hsl(0, ${20 + Math.random() * 30}%, ${20 + Math.random() * 15}%)`,
+      dead: Math.random() > 0.4
     });
   }
   
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 15; i++) {
     levelData.clouds.push({
       x: (Math.random() - 0.5) * WORLD_SIZE * 2,
-      y: 80 + Math.random() * 80,
+      y: 60 + Math.random() * 60,
       z: (Math.random() - 0.5) * WORLD_SIZE * 2,
-      size: 25 + Math.random() * 40,
-      speed: 0.01 + Math.random() * 0.02
+      size: 30 + Math.random() * 50,
+      speed: 0.005 + Math.random() * 0.01,
+      dark: Math.random() > 0.3
     });
   }
   
-  // 生成妖怪
   const demonCount = levelConfig.type === 'boss' ? levelConfig.enemies - 1 : levelConfig.enemies;
-  for (let i = 0; i < demonCount; i++) {
-    spawnDemon(levelNum);
-  }
-  
-  // 生成Boss
-  if (levelConfig.type === 'boss' && levelConfig.boss) {
-    spawnBoss(levelConfig.boss, levelNum);
-  }
-  
-  // 生成物品
-  for (let i = 0; i < 15; i++) {
-    spawnItem();
-  }
+  for (let i = 0; i < demonCount; i++) spawnDemon(levelNum);
+  if (levelConfig.type === 'boss' && levelConfig.boss) spawnBoss(levelConfig.boss, levelNum);
+  for (let i = 0; i < 12; i++) spawnItem();
   
   updateProgress();
   
@@ -379,49 +407,53 @@ function initLevel(levelNum) {
   } else {
     document.getElementById('bossBar').style.display = 'none';
   }
+  
+  // 恐怖文字提示
+  setTimeout(() => showHorrorText(), 5000 + Math.random() * 10000);
 }
 
 function spawnDemon(levelNum) {
   const angle = Math.random() * Math.PI * 2;
   const dist = 60 + Math.random() * 150;
-  const difficulty = 1 + levelNum * 0.1;
+  const difficulty = 1 + levelNum * 0.12;
   
   enemies.push({
     x: player.x + Math.cos(angle) * dist,
     y: 0,
     z: player.z + Math.sin(angle) * dist,
-    health: (40 + Math.random() * 30) * difficulty,
-    maxHealth: 70 * difficulty,
-    speed: 0.03 + Math.random() * 0.04,
-    damage: (8 + Math.random() * 12) * difficulty,
+    health: (45 + Math.random() * 35) * difficulty,
+    maxHealth: 80 * difficulty,
+    speed: 0.03 + Math.random() * 0.05,
+    damage: (10 + Math.random() * 15) * difficulty,
     type: 'demon',
-    name: '小妖',
+    name: '厉鬼',
     lastAttack: 0,
     size: 8,
-    color: '#8b0000',
+    color: `hsl(0, ${60 + Math.random() * 40}%, ${20 + Math.random() * 15}%)`,
     animation: Math.random() * Math.PI * 2,
-    isBoss: false
+    isBoss: false,
+    teleportTimer: Math.random() * 5000
   });
 }
 
 function spawnBoss(name, levelNum) {
   const angle = Math.random() * Math.PI * 2;
   const dist = 100 + Math.random() * 100;
-  const difficulty = 1 + levelNum * 0.15;
+  const difficulty = 1 + levelNum * 0.18;
   
   enemies.push({
     x: player.x + Math.cos(angle) * dist,
     y: 0,
     z: player.z + Math.sin(angle) * dist,
-    health: (300 + levelNum * 50) * difficulty,
-    maxHealth: (300 + levelNum * 50) * difficulty,
-    speed: 0.04 + Math.random() * 0.03,
-    damage: (25 + levelNum * 3) * difficulty,
+    health: (350 + levelNum * 60) * difficulty,
+    maxHealth: (350 + levelNum * 60) * difficulty,
+    speed: 0.04 + Math.random() * 0.04,
+    damage: (30 + levelNum * 4) * difficulty,
     type: 'boss',
     name: name,
     lastAttack: 0,
-    size: 20 + levelNum * 0.5,
-    color: '#ff4500',
+    size: 22 + levelNum * 0.5,
+    color: '#8b0000',
     animation: Math.random() * Math.PI * 2,
     isBoss: true,
     shieldGlow: 0,
@@ -443,6 +475,44 @@ function spawnItem() {
   });
 }
 
+function showHorrorText() {
+  if (!gameRunning) return;
+  const text = horrorTexts[Math.floor(Math.random() * horrorTexts.length)];
+  const el = document.getElementById('horrorText');
+  el.textContent = text;
+  el.style.opacity = 1;
+  setTimeout(() => { el.style.opacity = 0; }, 3000);
+  setTimeout(() => showHorrorText(), 15000 + Math.random() * 20000);
+}
+
+function triggerBloodEffect() {
+  bloodCtx.fillStyle = 'rgba(139, 0, 0, 0.3)';
+  bloodCtx.fillRect(0, 0, bloodCanvas.width, bloodCanvas.height);
+  
+  for (let i = 0; i < 10; i++) {
+    const x = Math.random() * bloodCanvas.width;
+    const y = Math.random() * bloodCanvas.height;
+    bloodCtx.fillStyle = `rgba(139, 0, 0, ${0.3 + Math.random() * 0.5})`;
+    bloodCtx.beginPath();
+    bloodCtx.arc(x, y, 10 + Math.random() * 30, 0, Math.PI * 2);
+    bloodCtx.fill();
+  }
+  
+  document.getElementById('bloodOverlay').style.opacity = 1;
+  setTimeout(() => {
+    document.getElementById('bloodOverlay').style.opacity = 0;
+  }, 500);
+}
+
+function triggerScreenShake() {
+  canvas.style.transform = `translate(${(Math.random() - 0.5) * 10}px, ${(Math.random() - 0.5) * 10}px)`;
+  setTimeout(() => { canvas.style.transform = 'none'; }, 100);
+}
+
+function triggerFlicker() {
+  flickerTimer = Date.now();
+}
+
 function update(deltaTime) {
   if (!gameRunning) return;
   
@@ -455,10 +525,7 @@ function update(deltaTime) {
   if (keys['d'] || keys['D']) { dx += Math.cos(player.yaw); dz -= Math.sin(player.yaw); }
   
   const len = Math.sqrt(dx * dx + dz * dz);
-  if (len > 0) {
-    dx = dx / len * moveSpeed;
-    dz = dz / len * moveSpeed;
-  }
+  if (len > 0) { dx = dx / len * moveSpeed; dz = dz / len * moveSpeed; }
   
   player.x += dx;
   player.z += dz;
@@ -493,10 +560,20 @@ function update(deltaTime) {
     const edz = player.z - enemy.z;
     const dist = Math.sqrt(edx * edx + edz * edz);
     
-    enemy.animation += 0.04;
-    if (enemy.isBoss) {
-      enemy.shieldGlow += 0.05;
-      enemy.aura += 0.03;
+    enemy.animation += 0.05;
+    if (enemy.isBoss) { enemy.shieldGlow += 0.05; enemy.aura += 0.03; }
+    
+    // 传送效果
+    if (!enemy.isBoss) {
+      enemy.teleportTimer -= deltaTime;
+      if (enemy.teleportTimer <= 0) {
+        const teleportDist = 20 + Math.random() * 30;
+        const teleportAngle = Math.random() * Math.PI * 2;
+        enemy.x = player.x + Math.cos(teleportAngle) * teleportDist;
+        enemy.z = player.z + Math.sin(teleportAngle) * teleportDist;
+        enemy.teleportTimer = 3000 + Math.random() * 5000;
+        createParticles(enemy.x, enemy.y + 10, enemy.z, '#8b0000', 8);
+      }
     }
     
     if (dist > 3) {
@@ -504,12 +581,14 @@ function update(deltaTime) {
       enemy.z += (edz / dist) * enemy.speed;
     } else {
       const now = Date.now();
-      if (now - enemy.lastAttack > 1200) {
+      if (now - enemy.lastAttack > 1000) {
         const damage = player.transform ? enemy.damage * 0.5 : enemy.damage;
         player.health -= damage;
         enemy.lastAttack = now;
-        showMessage(`受到攻击！-${damage.toFixed(0)}生命`);
-        createParticles(player.x, player.y + 10, player.z, '#ef4444', 10);
+        showMessage(`-${damage.toFixed(0)} 生命`);
+        createParticles(player.x, player.y + 10, player.z, '#dc2626', 12);
+        triggerBloodEffect();
+        triggerScreenShake();
       }
     }
     
@@ -519,7 +598,6 @@ function update(deltaTime) {
       enemy.z = player.z + Math.sin(angle) * 150;
     }
     
-    // 更新Boss血条
     if (enemy.isBoss && enemy === enemies.find(e => e.isBoss)) {
       document.getElementById('bossHealthFill').style.width = (enemy.health / enemy.maxHealth * 100) + '%';
     }
@@ -545,8 +623,15 @@ function update(deltaTime) {
   
   levelData.clouds.forEach(c => { c.x += c.speed; if (c.x > WORLD_SIZE) c.x = -WORLD_SIZE; });
   
-  player.health = Math.max(0, Math.min(player.maxHealth, player.health - 0.003));
-  if (player.health <= 0) gameOver('被妖怪打败了...');
+  // 恐怖效果
+  horrorTimer += deltaTime;
+  if (horrorTimer > 30000) {
+    horrorTimer = 0;
+    triggerFlicker();
+  }
+  
+  player.health = Math.max(0, Math.min(player.maxHealth, player.health - 0.005));
+  if (player.health <= 0) gameOver('被厉鬼吞噬...');
 }
 
 function attack() {
@@ -567,7 +652,7 @@ function attack() {
       const dist = Math.sqrt(edx * edx + edz * edz);
       if (dist < 15) {
         enemy.health -= skill.damage * damageMultiplier;
-        createParticles(enemy.x, enemy.y + 10, enemy.z, '#f59e0b', 12);
+        createParticles(enemy.x, enemy.y + 10, enemy.z, '#dc2626', 15);
         if (enemy.health <= 0) killEnemy(i);
       }
     });
@@ -600,7 +685,7 @@ function attack() {
       }
     });
   } else if (skill.name === '定身术') {
-    createParticles(player.x, player.y + 10, player.z, '#00bfff', 25);
+    createParticles(player.x, player.y + 10, player.z, '#7c3aed', 25);
     enemies.forEach(enemy => {
       const edx = enemy.x - player.x;
       const edz = enemy.z - player.z;
@@ -613,32 +698,30 @@ function attack() {
   } else if (skill.name === '七十二变') {
     player.transform = 'golden';
     player.transformTimer = 10000;
-    showMessage('七十二变！变身金猴王！');
+    showMessage('七十二变！');
     createParticles(player.x, player.y + 15, player.z, '#f59e0b', 40);
   }
 }
 
 function killEnemy(index) {
   const enemy = enemies[index];
-  createExplosion(enemy.x, enemy.y + 10, enemy.z, enemy.isBoss ? '#ff4500' : '#f59e0b');
+  createExplosion(enemy.x, enemy.y + 10, enemy.z, '#dc2626');
   enemies.splice(index, 1);
   kills++;
   levelKills++;
   score += enemy.isBoss ? 500 : 100;
   player.exp += enemy.isBoss ? 100 : 25;
   checkLevelUp();
-  showMessage(enemy.isBoss ? `击败${enemy.name}！+500` : '+100');
+  showMessage(enemy.isBoss ? `击败${enemy.name}！` : '+100');
   updateProgress();
   
   if (enemy.isBoss) {
     bossDefeated = true;
     document.getElementById('bossBar').style.display = 'none';
+    triggerBloodEffect();
   }
   
-  if (levelKills >= levelTarget && (bossDefeated || !levelBoss)) {
-    levelComplete();
-  }
-  
+  if (levelKills >= levelTarget && (bossDefeated || !levelBoss)) levelComplete();
   spawnItem();
 }
 
@@ -660,7 +743,6 @@ function checkLevelUp() {
     player.health = player.maxHealth;
     player.mana = player.maxMana;
     showMessage(`升级！等级 ${player.level}`);
-    createParticles(player.x, player.y + 15, player.z, '#f59e0b', 30);
   }
 }
 
@@ -687,12 +769,10 @@ function levelComplete() {
 
 function nextLevel() {
   document.getElementById('levelComplete').style.display = 'none';
-  if (currentLevel >= 81) {
-    gameWin();
-  } else {
+  if (currentLevel >= 81) { gameWin(); } 
+  else {
     initLevel(currentLevel + 1);
-    player.x = 0;
-    player.z = 0;
+    player.x = 0; player.z = 0;
     gameRunning = true;
     gameLoop();
   }
@@ -715,11 +795,11 @@ function gameOver(reason) {
   gameRunning = false;
   document.getElementById('gameOver').style.display = 'flex';
   document.getElementById('deathStats').innerHTML = `
-    失败原因：${reason}<br>
+    ${reason}<br>
     停在第${currentLevel}难<br>
     等级：${player.level}<br>
-    击杀妖怪：${kills}<br>
-    最终评分：${score}
+    击杀：${kills}<br>
+    评分：${score}
   `;
   document.body.style.cursor = 'default';
 }
@@ -759,41 +839,59 @@ function render() {
   const W = window.innerWidth;
   const H = window.innerHeight;
   
-  // 天空
+  // 恐怖闪烁效果
+  const now = Date.now();
+  if (now - flickerTimer < 200) {
+    ctx.fillStyle = `rgba(0,0,0,${Math.random() * 0.5})`;
+    ctx.fillRect(0, 0, W, H);
+    return;
+  }
+  
+  // 暗黑天空
   const skyGradient = ctx.createLinearGradient(0, 0, 0, H * 0.6);
-  skyGradient.addColorStop(0, '#1a0a2e');
-  skyGradient.addColorStop(0.5, '#2d1b4e');
-  skyGradient.addColorStop(1, '#4a1942');
+  skyGradient.addColorStop(0, '#050005');
+  skyGradient.addColorStop(0.5, '#0a000a');
+  skyGradient.addColorStop(1, '#150015');
   ctx.fillStyle = skyGradient;
   ctx.fillRect(0, 0, W, H);
   
-  // 星星
-  ctx.fillStyle = '#fff';
-  for (let i = 0; i < 150; i++) {
+  // 血色星星
+  ctx.fillStyle = '#8b0000';
+  for (let i = 0; i < 100; i++) {
     const sx = (Math.sin(i * 132.1) * 0.5 + 0.5) * W;
     const sy = (Math.cos(i * 73.7) * 0.5 + 0.5) * H * 0.4;
-    ctx.globalAlpha = 0.3 + Math.sin(Date.now() / 2000 + i) * 0.3;
+    ctx.globalAlpha = 0.2 + Math.sin(now / 3000 + i) * 0.2;
     ctx.beginPath();
     ctx.arc(sx, sy, 1, 0, Math.PI * 2);
     ctx.fill();
   }
   ctx.globalAlpha = 1;
   
-  // 月亮
-  ctx.fillStyle = '#f0f0e0';
-  ctx.shadowColor = '#f0f0e0';
-  ctx.shadowBlur = 30;
+  // 血月
+  ctx.fillStyle = '#8b0000';
+  ctx.shadowColor = '#8b0000';
+  ctx.shadowBlur = 50;
   ctx.beginPath();
-  ctx.arc(W * 0.8, H * 0.1, 40, 0, Math.PI * 2);
+  ctx.arc(W * 0.8, H * 0.1, 45, 0, Math.PI * 2);
   ctx.fill();
   ctx.shadowBlur = 0;
   
   // 地面
   const groundGradient = ctx.createLinearGradient(0, H * 0.6, 0, H);
-  groundGradient.addColorStop(0, '#2a2a1a');
-  groundGradient.addColorStop(1, '#0a0a0a');
+  groundGradient.addColorStop(0, '#1a0a0a');
+  groundGradient.addColorStop(1, '#050005');
   ctx.fillStyle = groundGradient;
   ctx.fillRect(0, H * 0.6, W, H * 0.4);
+  
+  // 血迹
+  bloodStains.forEach(b => {
+    ctx.globalAlpha = b.life;
+    ctx.fillStyle = '#8b0000';
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  });
   
   // 云朵
   levelData.clouds.forEach(c => {
@@ -805,8 +903,8 @@ function render() {
       const scale = 200 / rotZ;
       const screenX = W / 2 + rotX * scale;
       const screenY = H * 0.6 - c.y * scale;
-      ctx.globalAlpha = 0.4;
-      ctx.fillStyle = '#fff';
+      ctx.globalAlpha = c.dark ? 0.6 : 0.3;
+      ctx.fillStyle = c.dark ? '#1a0a0a' : '#2a1a1a';
       ctx.beginPath();
       ctx.arc(screenX, screenY, c.size * scale, 0, Math.PI * 2);
       ctx.fill();
@@ -814,7 +912,6 @@ function render() {
     }
   });
   
-  // 收集3D对象
   const objects3D = [];
   
   levelData.buildings.forEach(b => {
@@ -831,7 +928,8 @@ function render() {
         w: b.w * scale,
         h: b.h * scale,
         d: rotZ,
-        color: b.color
+        color: b.color,
+        damaged: b.damaged
       });
     }
   });
@@ -850,7 +948,8 @@ function render() {
         h: t.h * scale,
         r: t.r * scale,
         d: rotZ,
-        color: t.color
+        color: t.color,
+        dead: t.dead
       });
     }
   });
@@ -922,36 +1021,50 @@ function render() {
     if (obj.type === 'building') {
       ctx.fillStyle = obj.color;
       ctx.fillRect(obj.x - obj.w/2, obj.y, obj.w, obj.h);
-      ctx.fillStyle = '#dc2626';
-      ctx.beginPath();
-      ctx.moveTo(obj.x - obj.w/2 - 5, obj.y);
-      ctx.lineTo(obj.x, obj.y - obj.h * 0.25);
-      ctx.lineTo(obj.x + obj.w/2 + 5, obj.y);
-      ctx.closePath();
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+      if (obj.damaged) {
+        ctx.strokeStyle = '#8b0000';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(obj.x - obj.w/4, obj.y);
+        ctx.lineTo(obj.x + obj.w/4, obj.y + obj.h);
+        ctx.stroke();
+      }
+      ctx.strokeStyle = 'rgba(139,0,0,0.3)';
       ctx.lineWidth = 2;
       ctx.strokeRect(obj.x - obj.w/2, obj.y, obj.w, obj.h);
     } else if (obj.type === 'tree') {
-      ctx.fillStyle = '#5a3d2b';
+      ctx.fillStyle = '#3a1a1a';
       ctx.fillRect(obj.x - 3, obj.y - obj.h * 0.4, 6, obj.h * 0.4);
-      ctx.fillStyle = obj.color;
-      ctx.beginPath();
-      ctx.arc(obj.x, obj.y - obj.h * 0.6, obj.r, 0, Math.PI * 2);
-      ctx.fill();
+      if (obj.dead) {
+        ctx.strokeStyle = obj.color;
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(obj.x, obj.y - obj.h * 0.4);
+        ctx.lineTo(obj.x - obj.r, obj.y - obj.h * 0.7);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(obj.x, obj.y - obj.h * 0.3);
+        ctx.lineTo(obj.x + obj.r * 0.8, obj.y - obj.h * 0.6);
+        ctx.stroke();
+      } else {
+        ctx.fillStyle = obj.color;
+        ctx.beginPath();
+        ctx.arc(obj.x, obj.y - obj.h * 0.6, obj.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
     } else if (obj.type === 'enemy') {
       const bodyWidth = obj.size * 0.8;
       const bodyHeight = obj.size * 1.2;
-      const wobble = Math.sin(obj.animation) * 3;
+      const wobble = Math.sin(obj.animation) * 4;
       
       if (obj.isBoss) {
-        ctx.globalAlpha = 0.3;
-        const auraGradient = ctx.createRadialGradient(obj.x, obj.y - bodyHeight/2, 0, obj.x, obj.y - bodyHeight/2, obj.size * 1.5);
-        auraGradient.addColorStop(0, 'rgba(255,69,0,0.4)');
-        auraGradient.addColorStop(1, 'rgba(255,69,0,0)');
+        ctx.globalAlpha = 0.4;
+        const auraGradient = ctx.createRadialGradient(obj.x, obj.y - bodyHeight/2, 0, obj.x, obj.y - bodyHeight/2, obj.size * 2);
+        auraGradient.addColorStop(0, 'rgba(139,0,0,0.5)');
+        auraGradient.addColorStop(1, 'rgba(139,0,0,0)');
         ctx.fillStyle = auraGradient;
         ctx.beginPath();
-        ctx.arc(obj.x, obj.y - bodyHeight/2, obj.size * 1.5, 0, Math.PI * 2);
+        ctx.arc(obj.x, obj.y - bodyHeight/2, obj.size * 2, 0, Math.PI * 2);
         ctx.fill();
         ctx.globalAlpha = 1;
       }
@@ -962,30 +1075,31 @@ function render() {
       ctx.arc(obj.x + wobble, obj.y - bodyHeight - obj.size * 0.3, obj.size * 0.35, 0, Math.PI * 2);
       ctx.fill();
       
+      // 恐怖眼睛
       ctx.fillStyle = '#ff0000';
       ctx.shadowColor = '#ff0000';
-      ctx.shadowBlur = 10;
+      ctx.shadowBlur = 20;
       ctx.beginPath();
-      ctx.arc(obj.x - obj.size * 0.12 + wobble, obj.y - bodyHeight - obj.size * 0.35, obj.size * 0.08, 0, Math.PI * 2);
+      ctx.arc(obj.x - obj.size * 0.15 + wobble, obj.y - bodyHeight - obj.size * 0.35, obj.size * 0.1, 0, Math.PI * 2);
       ctx.fill();
       ctx.beginPath();
-      ctx.arc(obj.x + obj.size * 0.12 + wobble, obj.y - bodyHeight - obj.size * 0.35, obj.size * 0.08, 0, Math.PI * 2);
+      ctx.arc(obj.x + obj.size * 0.15 + wobble, obj.y - bodyHeight - obj.size * 0.35, obj.size * 0.1, 0, Math.PI * 2);
       ctx.fill();
       ctx.shadowBlur = 0;
       
       ctx.fillStyle = 'rgba(0,0,0,0.6)';
       ctx.fillRect(obj.x - obj.size/2, obj.y - obj.size - 14, obj.size, 8);
       const healthPercent = obj.health / obj.maxHealth;
-      ctx.fillStyle = healthPercent > 0.5 ? '#22c55e' : healthPercent > 0.25 ? '#f59e0b' : '#ef4444';
+      ctx.fillStyle = '#8b0000';
       ctx.fillRect(obj.x - obj.size/2, obj.y - obj.size - 14, healthPercent * obj.size, 8);
       
-      ctx.fillStyle = obj.isBoss ? '#ff4500' : '#fff';
+      ctx.fillStyle = obj.isBoss ? '#ff0000' : '#8b0000';
       ctx.font = `${Math.max(10, obj.size * 0.3)}px STKaiti, KaiTi, serif`;
       ctx.textAlign = 'center';
       ctx.fillText(obj.name, obj.x + wobble, obj.y - obj.size - 18);
     } else if (obj.type === 'item') {
       const pulse = Math.sin(obj.glow) * 0.2 + 1;
-      const itemColors = { health: '#ef4444', mana: '#3b82f6', exp: '#f59e0b' };
+      const itemColors = { health: '#8b0000', mana: '#4a0080', exp: '#8b6914' };
       const itemIcons = { health: '❤️', mana: '💧', exp: '⭐' };
       
       ctx.fillStyle = itemColors[obj.itemType];
@@ -1004,12 +1118,19 @@ function render() {
     }
   });
   
-  // 暗角
-  const vignette = ctx.createRadialGradient(W/2, H/2, W * 0.4, W/2, H/2, W * 0.8);
+  // 恐怖暗角
+  const vignette = ctx.createRadialGradient(W/2, H/2, W * 0.3, W/2, H/2, W * 0.7);
   vignette.addColorStop(0, 'rgba(0,0,0,0)');
-  vignette.addColorStop(1, 'rgba(0,0,0,0.3)');
+  vignette.addColorStop(0.5, 'rgba(0,0,0,0.3)');
+  vignette.addColorStop(1, 'rgba(0,0,0,0.7)');
   ctx.fillStyle = vignette;
   ctx.fillRect(0, 0, W, H);
+  
+  // 低血量恐怖效果
+  if (player.health < 30) {
+    ctx.fillStyle = `rgba(139,0,0,${0.1 + Math.sin(now / 500) * 0.05})`;
+    ctx.fillRect(0, 0, W, H);
+  }
   
   updateUI();
 }
@@ -1030,16 +1151,10 @@ function updateUI() {
 function startGame() {
   document.getElementById('startScreen').style.display = 'none';
   gameRunning = true;
-  score = 0;
-  kills = 0;
-  player.x = 0;
-  player.y = 0;
-  player.z = 0;
-  player.health = 100;
-  player.mana = 100;
-  player.exp = 0;
-  player.level = 1;
-  player.transform = null;
+  score = 0; kills = 0;
+  player.x = 0; player.y = 0; player.z = 0;
+  player.health = 100; player.mana = 100; player.exp = 0;
+  player.level = 1; player.transform = null;
   document.body.style.cursor = 'none';
   initLevel(1);
   gameLoop();
